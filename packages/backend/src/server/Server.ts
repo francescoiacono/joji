@@ -1,3 +1,4 @@
+import { SessionManager } from '@/session';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 
@@ -10,9 +11,11 @@ interface ServerStartOptions {
  */
 export class Server {
   private io: IOServer;
+  private sessionManager: SessionManager;
 
   constructor() {
     this.io = new IOServer();
+    this.sessionManager = new SessionManager();
   }
 
   /**
@@ -30,8 +33,13 @@ export class Server {
     this.io.on('connection', socket => {
       logger.debug('A user connected');
 
+      // Get the session
+      const session = this.sessionManager.getSession(socket);
+      logger.debug(`Session ID: ${session.id}`);
+
       // Handle the disconnect event
       socket.on('disconnect', () => {
+        this.sessionManager.deleteSession(socket);
         logger.debug('User disconnected');
       });
     });
