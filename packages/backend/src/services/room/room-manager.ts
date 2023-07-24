@@ -1,6 +1,6 @@
-import { randomString } from '@/utils/random-string';
+import { randomString } from '@/utils';
+import { RoomUser } from '@/services';
 import { Room } from './room';
-import { RoomUser } from '@/room-user';
 
 interface CreateRoomOptions {
   host: RoomUser;

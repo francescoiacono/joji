@@ -1,9 +1,8 @@
-import { RoomManager } from '@/room';
-import { SessionManager } from '@/session';
+import { RoomManager, SessionManager } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { RoomEvent } from '@joji/types';
-import { createRoomHandler } from './handlers';
+import { createRoomHandler } from '@/listeners';
 
 interface ServerStartOptions {
   port?: number;

@@ -1,4 +1,4 @@
-import { Room } from '@/room';
+import { Room } from '@/services';
 import { Socket } from 'socket.io';
 
 export interface SessionOptions {

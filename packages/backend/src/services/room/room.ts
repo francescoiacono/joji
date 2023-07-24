@@ -1,4 +1,4 @@
-import { RoomUser } from '@/room-user';
+import { RoomUser } from '@/services';
 import { v4 as uuidv4 } from 'uuid';
 
 interface RoomOptions {

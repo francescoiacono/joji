@@ -1,9 +1,8 @@
-import { RoomUser } from '@/room-user';
-import { Server } from '@/server';
+import { Socket } from 'socket.io';
+import { Server, RoomUser } from '@/services';
 import { socketError } from '@/utils';
 import { RoomConfig } from '@joji/config';
 import { RoomEvent, RoomMessage } from '@joji/types';
-import { Socket } from 'socket.io';
 
 interface CreateRoomHandlerOptions {
   server: Server;
