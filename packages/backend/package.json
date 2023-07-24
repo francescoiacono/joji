@@ -1,5 +1,5 @@
 {
-  "name": "joji-backend",
+  "name": "@joji/backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@joji/config": "^1.0.0",
+    "@joji/types": "^1.0.0",
     "dotenv": "^16.3.1",
     "socket.io": "^4.7.1",
     "uuid": "^9.0.0",

@@ -1,2 +1,2 @@
 export * from './session';
-export * from './sessionManager';
+export * from './session-manager';

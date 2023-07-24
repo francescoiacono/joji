@@ -1,6 +1,9 @@
+import { RoomManager } from '@/room';
 import { SessionManager } from '@/session';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
+import { RoomEvent } from '@joji/types';
+import { createRoomHandler } from './handlers';
 
 interface ServerStartOptions {
   port?: number;
@@ -10,12 +13,14 @@ interface ServerStartOptions {
  * This class encapsulates the Socket.IO server
  */
 export class Server {
+  public sessionManager: SessionManager;
+  public roomManager: RoomManager;
   private io: IOServer;
-  private sessionManager: SessionManager;
 
   constructor() {
     this.io = new IOServer();
     this.sessionManager = new SessionManager();
+    this.roomManager = new RoomManager();
   }
 
   /**
@@ -33,9 +38,10 @@ export class Server {
     this.io.on('connection', socket => {
       logger.debug('A user connected');
 
-      // Get the session
-      const session = this.sessionManager.getSession(socket);
-      logger.debug(`Session ID: ${session.id}`);
+      // Listen for events
+      socket.on(RoomEvent.CreateRoom, data =>
+        createRoomHandler({ server: this, socket, data })
+      );
 
       // Handle the disconnect event
       socket.on('disconnect', () => {
