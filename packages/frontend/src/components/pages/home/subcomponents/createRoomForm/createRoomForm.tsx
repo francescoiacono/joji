@@ -2,8 +2,8 @@
 
 import { RoomEvent, SocketEvent } from '@joji/types';
 import { useEffect, useState } from 'react';
-import io, { Socket } from 'socket.io-client';
 import { useRouter } from 'next/navigation';
+import { useSocket } from '@/providers/socketProvider';
 
 type FormState = {
   error: string;
@@ -12,7 +12,7 @@ type FormState = {
 };
 
 const CreateRoomForm = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const { socket } = useSocket();
   const [hostName, setHostName] = useState<string>('');
   const [formState, setFormState] = useState<FormState>({
     error: '',
@@ -23,27 +23,16 @@ const CreateRoomForm = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!socket) {
-      initialiseSocket();
-    } else {
+    if (socket) {
+      setFormState({ ...formState, loading: false });
       handleListeners();
     }
-  }, [socket]);
 
-  const initialiseSocket = () => {
-    setFormState({ ...formState, loading: true });
-    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-    if (!serverUrl) {
-      setFormState({
-        ...formState,
-        error: 'Server URL is not defined',
-        loading: false
-      });
-    } else {
-      setSocket(io(serverUrl));
-      setFormState({ ...formState, loading: false });
+    if (formState.data) {
+      console.log('formState.data', formState.data);
+      router.push(`/room/${formState.data.id}`);
     }
-  };
+  }, [socket, formState.data]);
 
   const handleListeners = () => {
     socket?.on(RoomEvent.RoomCreated, data => {
@@ -65,19 +54,29 @@ const CreateRoomForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <section>
-        <h2>Create a room!</h2>
-      </section>
-      <section>
-        <label>Room Name</label>
-        <input type='text' placeholder='Your name!' onChange={handleChange} />
-      </section>
+    <section>
+      {formState.loading ? (
+        <p>Loading...</p>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <section>
+            <h2>Create a room!</h2>
+          </section>
+          <section>
+            <label>Room Name</label>
+            <input
+              type='text'
+              placeholder='Your name!'
+              onChange={handleChange}
+            />
+          </section>
 
-      <section>{formState.error}</section>
+          <section>{formState.error}</section>
 
-      <button>Submit</button>
-    </form>
+          <button>Submit</button>
+        </form>
+      )}
+    </section>
   );
 };
 
