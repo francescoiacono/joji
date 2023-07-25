@@ -1,5 +1,4 @@
 import { RoomUser } from '@/services';
-import { v4 as uuidv4 } from 'uuid';
 
 interface RoomOptions {
   joinCode: string;
@@ -7,13 +6,11 @@ interface RoomOptions {
 }
 
 export class Room {
-  public id: string;
   public joinCode: string;
   public host: RoomUser;
   public users: Array<RoomUser> = [];
 
   constructor(options: RoomOptions) {
-    this.id = uuidv4();
     this.joinCode = options.joinCode;
     this.host = options.host;
 
@@ -41,10 +38,17 @@ export class Room {
   /**
    * Removes a user from the room
    */
-  public removeUser(user: RoomUser): void {
-    const index = this.users.findIndex(u => u.sessionId === user.sessionId);
+  public removeUser(sessionId: RoomUser['sessionId']): void {
+    const index = this.users.findIndex(u => u.sessionId === sessionId);
     if (index !== -1) {
       this.users.splice(index, 1);
     }
+  }
+
+  /**
+   * Sets the host of the room
+   */
+  public setHost(user: RoomUser): void {
+    this.host = user;
   }
 }

@@ -2,7 +2,12 @@ import { RoomManager, SessionManager } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { RoomEvent } from '@joji/types';
-import { createRoomHandler } from '@/listeners';
+import {
+  createRoomHandler,
+  getRoomByJoinCodeHandler,
+  getRoomHandler,
+  leaveRoomHandler
+} from '@/listeners';
 
 interface ServerStartOptions {
   port?: number;
@@ -43,8 +48,17 @@ export class Server {
       logger.debug('A user connected');
 
       // Listen for events
+      socket.on(RoomEvent.GetRoom, () =>
+        getRoomHandler({ server: this, socket })
+      );
+      socket.on(RoomEvent.GetRoomByJoinCode, data =>
+        getRoomByJoinCodeHandler({ server: this, socket, data })
+      );
       socket.on(RoomEvent.CreateRoom, data =>
         createRoomHandler({ server: this, socket, data })
+      );
+      socket.on(RoomEvent.LeaveRoom, () =>
+        leaveRoomHandler({ server: this, socket })
       );
 
       // Handle the disconnect event

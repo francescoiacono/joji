@@ -52,21 +52,6 @@ export class SessionManager {
 
   /**
    * Returns the session ID associated with the given socket.
-   * If the socket does not have a session ID, a new one is generated
-   * and assigned to the socket
-   */
-  private getSessionId(socket: Socket): string {
-    let sessionId = this.getSessionIdFromSocket(socket);
-    if (!sessionId) {
-      sessionId = this.generateSessionId();
-      socket.handshake.auth.sessionId = sessionId;
-    }
-
-    return sessionId;
-  }
-
-  /**
-   * Returns the session ID associated with the given socket.
    */
   public getSessionIdFromSocket(socket: Socket): string | undefined {
     return socket.handshake.auth.sessionId;
