@@ -17,7 +17,12 @@ export class Server {
   private io: IOServer;
 
   constructor() {
-    this.io = new IOServer();
+    this.io = new IOServer({
+      cors: {
+        origin: process.env.CLIENT_URL,
+        methods: ['GET']
+      }
+    });
     this.sessionManager = new SessionManager();
     this.roomManager = new RoomManager();
   }
