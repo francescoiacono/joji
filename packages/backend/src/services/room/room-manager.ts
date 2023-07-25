@@ -1,5 +1,5 @@
 import { randomString } from '@/utils';
-import { RoomUser } from '@/services';
+import { RoomUser, Session } from '@/services';
 import { Room } from './room';
 
 interface CreateRoomOptions {
@@ -7,16 +7,33 @@ interface CreateRoomOptions {
 }
 
 export class RoomManager {
-  private rooms: Map<Room['id'], Room>;
-  private joinCodes: Set<string>;
+  private rooms: Map<Room['joinCode'], Room>;
+  private roomUsers: Map<Session['id'], Room['joinCode']>;
 
   constructor() {
     this.rooms = new Map();
-    this.joinCodes = new Set();
+    this.roomUsers = new Map();
   }
 
   /**
-   * Creates a new room and returns it
+   * Returns the room with the given join code
+   */
+  public getRoom(joinCode: Room['joinCode']): Room | undefined {
+    return this.rooms.get(joinCode);
+  }
+
+  /**
+   * Returns the room that the user with the given session is in
+   */
+  public getUserRoom(sessionId: Session['id']): Room | undefined {
+    const joinCode = this.roomUsers.get(sessionId);
+    if (joinCode) {
+      return this.getRoom(joinCode);
+    }
+  }
+
+  /**
+   * Creates a new room, adds the host to it, and returns it
    */
   public createRoom(options: CreateRoomOptions): Room {
     const { host } = options;
@@ -24,20 +41,25 @@ export class RoomManager {
     const joinCode = this.generateUniqueJoinCode();
     const room = new Room({ joinCode, host });
 
-    this.rooms.set(room.id, room);
-    this.joinCodes.add(joinCode);
+    this.rooms.set(room.joinCode, room);
+    this.roomUsers.set(host.sessionId, room.joinCode);
 
     return room;
   }
 
   /**
-   * Deletes the room with the given ID
+   * Deletes the room with the given code
    */
-  public deleteRoom(id: Room['id']): void {
-    const room = this.rooms.get(id);
+  public deleteRoom(joinCode: Room['joinCode']): void {
+    const room = this.getRoom(joinCode);
     if (room) {
-      this.rooms.delete(id);
-      this.joinCodes.delete(room.joinCode);
+      // Remove all users from the room
+      room.users.forEach(user => {
+        this.roomUsers.delete(user.sessionId);
+      });
+
+      // Delete the room
+      this.rooms.delete(joinCode);
     }
   }
 
@@ -56,6 +78,6 @@ export class RoomManager {
    * Returns if a join code exists
    */
   private joinCodeExists(joinCode: string): boolean {
-    return this.joinCodes.has(joinCode);
+    return this.rooms.has(joinCode);
   }
 }

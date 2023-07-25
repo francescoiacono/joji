@@ -20,7 +20,7 @@ export const createRoomHandler = (options: CreateRoomHandlerOptions) => {
   const session = sessionManager.getSession(socket);
 
   // Make sure the session isn't already in a room
-  if (session.roomId) {
+  if (roomManager.getUserRoom(session.id)) {
     return socketError(socket, RoomMessage.AlreadyInRoom);
   }
 
@@ -33,14 +33,12 @@ export const createRoomHandler = (options: CreateRoomHandlerOptions) => {
   }
 
   // Create a room with the session
+  // This will also add the session to the room
   const host = new RoomUser({
     sessionId: session.id,
     displayName: data.hostName
   });
   const room = roomManager.createRoom({ host });
-
-  // Join the room
-  session.joinRoom(room.id);
 
   // Emit the room created event
   socket.emit(RoomEvent.RoomCreated, room);

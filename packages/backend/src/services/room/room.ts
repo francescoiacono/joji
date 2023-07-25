@@ -1,5 +1,4 @@
 import { RoomUser } from '@/services';
-import { v4 as uuidv4 } from 'uuid';
 
 interface RoomOptions {
   joinCode: string;
@@ -7,13 +6,11 @@ interface RoomOptions {
 }
 
 export class Room {
-  public id: string;
   public joinCode: string;
   public host: RoomUser;
   public users: Array<RoomUser> = [];
 
   constructor(options: RoomOptions) {
-    this.id = uuidv4();
     this.joinCode = options.joinCode;
     this.host = options.host;
 
