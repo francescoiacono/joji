@@ -9,5 +9,12 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "build:types": "tsc -p packages/types"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3"
   }
 }
