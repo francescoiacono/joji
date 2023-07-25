@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 import { Server, RoomUser } from '@/services';
-import { socketError } from '@/utils';
+import { logger, socketError } from '@/utils';
 import { RoomConfig } from '@joji/config';
 import { RoomEvent, RoomMessage } from '@joji/types';
 
@@ -15,6 +15,8 @@ interface CreateRoomHandlerOptions {
 export const createRoomHandler = (options: CreateRoomHandlerOptions) => {
   const { server, socket, data } = options;
   const { sessionManager, roomManager } = server;
+
+  logger.debug('createRoomHandler', { socketId: socket.id });
 
   // Get the session from the server
   const session = sessionManager.getSession(socket);

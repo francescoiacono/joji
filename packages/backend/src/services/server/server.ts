@@ -2,7 +2,7 @@ import { RoomManager, SessionManager } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { RoomEvent } from '@joji/types';
-import { createRoomHandler } from '@/listeners';
+import { createRoomHandler, leaveRoomHandler } from '@/listeners';
 
 interface ServerStartOptions {
   port?: number;
@@ -45,6 +45,9 @@ export class Server {
       // Listen for events
       socket.on(RoomEvent.CreateRoom, data =>
         createRoomHandler({ server: this, socket, data })
+      );
+      socket.on(RoomEvent.LeaveRoom, () =>
+        leaveRoomHandler({ server: this, socket })
       );
 
       // Handle the disconnect event

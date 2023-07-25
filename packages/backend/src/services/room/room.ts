@@ -38,10 +38,17 @@ export class Room {
   /**
    * Removes a user from the room
    */
-  public removeUser(user: RoomUser): void {
-    const index = this.users.findIndex(u => u.sessionId === user.sessionId);
+  public removeUser(sessionId: RoomUser['sessionId']): void {
+    const index = this.users.findIndex(u => u.sessionId === sessionId);
     if (index !== -1) {
       this.users.splice(index, 1);
     }
+  }
+
+  /**
+   * Sets the host of the room
+   */
+  public setHost(user: RoomUser): void {
+    this.host = user;
   }
 }

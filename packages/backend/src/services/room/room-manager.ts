@@ -5,6 +5,10 @@ import { Room } from './room';
 interface CreateRoomOptions {
   host: RoomUser;
 }
+interface AddUserToRoomOptions {
+  user: RoomUser;
+  joinCode: Room['joinCode'];
+}
 
 export class RoomManager {
   private rooms: Map<Room['joinCode'], Room>;
@@ -55,12 +59,50 @@ export class RoomManager {
     if (room) {
       // Remove all users from the room
       room.users.forEach(user => {
-        this.roomUsers.delete(user.sessionId);
+        this.removeUserFromRoom(user.sessionId);
       });
 
       // Delete the room
       this.rooms.delete(joinCode);
     }
+  }
+
+  /**
+   * Adds a user to the room with the given join code
+   */
+  public addUserToRoom(options: AddUserToRoomOptions): Room | undefined {
+    const { user, joinCode } = options;
+    const room = this.getRoom(joinCode);
+    if (room) {
+      room.addUser(user);
+      this.roomUsers.set(user.sessionId, room.joinCode);
+    }
+    return room;
+  }
+
+  /**
+   * Removes a user from the room they are in
+   */
+  public removeUserFromRoom(sessionId: Session['id']): Room | undefined {
+    const room = this.getUserRoom(sessionId);
+    if (room) {
+      room.removeUser(sessionId);
+      this.roomUsers.delete(sessionId);
+
+      // If the user was the host, re-assign the host
+      if (room.host.sessionId === sessionId) {
+        const newHost = room.users[0];
+        if (newHost) {
+          room.setHost(newHost);
+        }
+      }
+
+      // If the room is empty after re-assigning the host, delete it
+      if (room.users.length === 0) {
+        this.deleteRoom(room.joinCode);
+      }
+    }
+    return room;
   }
 
   /**
