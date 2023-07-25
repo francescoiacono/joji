@@ -1,4 +1,4 @@
-import { SocketProvider } from '@/providers/socketProvider';
+import { SocketProvider } from '@/providers';
 import CreateRoomForm from './subcomponents/createRoomForm/createRoomForm';
 
 const Home = () => {

@@ -29,7 +29,6 @@ const CreateRoomForm = () => {
     }
 
     if (formState.data) {
-      console.log('formState.data', formState.data);
       router.push(`/room/${formState.data.id}`);
     }
   }, [socket, formState.data]);

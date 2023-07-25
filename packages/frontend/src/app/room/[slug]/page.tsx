@@ -1,9 +1,7 @@
+import Room from '@/components/pages/room/room';
+
 const Page = () => {
-  return (
-    <div>
-      <h1>Room</h1>
-    </div>
-  );
+  return <Room />;
 };
 
 export default Page;
