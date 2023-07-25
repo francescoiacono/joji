@@ -20,6 +20,6 @@ export const leaveRoomHandler = (options: LeaveRoomHandlerOptions) => {
   // Remove the user from the room
   const room = roomManager.removeUserFromRoom(session.id);
 
-  // Emit the room created event
+  // Emit the room left event
   socket.emit(RoomEvent.RoomLeft, room);
 };
