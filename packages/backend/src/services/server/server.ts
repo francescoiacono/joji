@@ -27,7 +27,7 @@ export class Server {
    */
   public start(options: ServerStartOptions = {}): void {
     // Start the server
-    const port = Number(process.env.PORT) || options.port || 3000;
+    const port = Number(process.env.PORT) || options.port || 8000;
     this.io.listen(port);
 
     // Log the server start event
