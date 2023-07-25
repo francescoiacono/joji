@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n \"CLIENT, SERVER\" -c \"bgWhite.bold,bgMagenta.bold\" \"npm run dev --workspace=packages/frontend\" \"npm run dev --workspace=packages/backend\""
+    "dev": "concurrently -n \"CLIENT,SERVER\" -c \"bgBlack.bold,bgMagenta.bold\" \"npm run dev --workspace=packages/frontend\" \"npm run dev --workspace=packages/backend\""
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

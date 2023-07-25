@@ -1,10 +1,13 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { Nunito } from 'next/font/google';
 
 export const metadata: Metadata = {
   title: 'Joji',
   description: ''
 };
+
+const nunito = Nunito({ subsets: ['latin'] });
 
 export default function RootLayout({
   children
@@ -12,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en'>
+    <html lang='en' className={nunito.className}>
       <body>{children}</body>
     </html>
   );
