@@ -5,13 +5,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build:types": "tsc -p packages/types",
-    "prepare": "husky install"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run build:types"
-    }
+    "prepare": "husky install",
+    "build:types": "tsc -p packages/types"
   },
   "devDependencies": {
     "husky": "^8.0.3"
