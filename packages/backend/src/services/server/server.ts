@@ -1,7 +1,7 @@
 import { RoomManager, SessionManager } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
-import { RoomEvent } from '@joji/types';
+import { RoomEvent, SocketEvent } from '@joji/types';
 import {
   createRoomHandler,
   getRoomByJoinCodeHandler,
@@ -46,6 +46,10 @@ export class Server {
     // Listen for new connections
     this.io.on('connection', socket => {
       logger.debug('A user connected');
+
+      // Get the session and send it to the client
+      const session = this.sessionManager.getSession(socket);
+      socket.emit(SocketEvent.Session, session);
 
       // Listen for events
       socket.on(RoomEvent.GetRoom, () =>
