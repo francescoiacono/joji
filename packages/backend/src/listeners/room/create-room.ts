@@ -1,13 +1,13 @@
-import { RoomUser, Room } from '@/services';
+import { RoomUser } from '@/services';
 import { logger } from '@/utils';
-import { RoomMessage } from '@joji/types';
+import { RoomClient, RoomMessage } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
 interface Data {
   displayName?: string;
 }
-type Response = Room | null;
+type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
 
 export const createRoomHandler = (options: Options) => {
@@ -39,5 +39,8 @@ export const createRoomHandler = (options: Options) => {
   const room = roomManager.createRoom({ host });
 
   // Acknowledge the event with the room
-  return ack({ success: true, data: room });
+  return ack({
+    success: true,
+    data: room.getClient(session.id)
+  });
 };

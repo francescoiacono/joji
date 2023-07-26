@@ -1,4 +1,4 @@
-import { Server } from '@/services';
+import { Server, Session } from '@/services';
 import { RoomEvent, SocketResponse } from '@joji/types';
 import {
   createRoomHandler,
@@ -11,6 +11,7 @@ import { Socket } from 'socket.io';
 export interface HandlerOptions<TData, TResponse> {
   server: Server;
   socket: Socket;
+  session: Session;
   data: TData;
   ack: (res: SocketResponse<TResponse>) => void;
 }
@@ -20,7 +21,8 @@ export const listeners = (server: Server, socket: Socket) => {
     handler: (options: HandlerOptions<TData, TResponse>) => void
   ) => {
     return (data: TData, ack: (res: SocketResponse<TResponse>) => void) => {
-      handler({ server, socket, data, ack });
+      const session = server.sessionManager.getSessionBySocket(socket);
+      handler({ server, socket, session, data, ack });
     };
   };
 

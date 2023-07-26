@@ -1,4 +1,3 @@
-export interface RoomUser {
-    sessionId: string;
+export interface RoomUserClient {
     displayName: string;
 }

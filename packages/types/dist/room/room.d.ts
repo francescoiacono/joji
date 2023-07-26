@@ -1,6 +1,7 @@
-import { RoomUser } from '../room-user';
-export interface Room {
+import { RoomUserClient } from '../room-user';
+export interface RoomClient {
     joinCode: string;
-    host: RoomUser;
-    users: Array<RoomUser>;
+    host: RoomUserClient;
+    users: Array<RoomUserClient>;
+    isUserInRoom: boolean;
 }

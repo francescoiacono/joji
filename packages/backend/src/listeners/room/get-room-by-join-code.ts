@@ -1,15 +1,15 @@
-import { Room } from '@/services';
 import { logger } from '@/utils';
 import { HandlerOptions } from '..';
+import { RoomClient } from '@joji/types';
 
 interface Data {
   joinCode: string;
 }
-type Response = Room | null;
+type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
 
 export const getRoomByJoinCodeHandler = (options: Options) => {
-  const { server, socket, data, ack } = options;
+  const { server, socket, session, data, ack } = options;
   const { roomManager } = server;
 
   logger.debug('getRoomByJoinCodeHandler', { socketId: socket.id });
@@ -18,5 +18,8 @@ export const getRoomByJoinCodeHandler = (options: Options) => {
   const room = roomManager.getRoom(data.joinCode);
 
   // Acknowledge the event with the room
-  return ack({ success: true, data: room });
+  return ack({
+    success: true,
+    data: room?.getClient(session.id) ?? null
+  });
 };

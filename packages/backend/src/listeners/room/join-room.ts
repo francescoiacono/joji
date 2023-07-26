@@ -1,6 +1,6 @@
-import { RoomUser, Room } from '@/services';
+import { RoomUser } from '@/services';
 import { logger } from '@/utils';
-import { RoomEvent, RoomMessage, SocketMessage } from '@joji/types';
+import { RoomClient, RoomEvent, RoomMessage, SocketMessage } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
@@ -8,17 +8,14 @@ interface Data {
   roomCode?: string;
   displayName?: string;
 }
-type Response = Room | null;
+type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
 
 export const joinRoomHandler = (options: Options) => {
-  const { server, socket, data, ack } = options;
-  const { sessionManager, roomManager } = server;
+  const { server, socket, session, data, ack } = options;
+  const { roomManager } = server;
 
   logger.debug('joinRoomHandler', { socketId: socket.id });
-
-  // Get the session from the server
-  const session = sessionManager.getSessionBySocket(socket);
 
   // Make sure all the data is present
   if (!data.roomCode || !data.displayName) {
@@ -48,10 +45,10 @@ export const joinRoomHandler = (options: Options) => {
   }
 
   // Create the user
-  const user: RoomUser = {
+  const user = new RoomUser({
     sessionId: session.id,
     displayName: data.displayName
-  };
+  });
 
   // Add the user to the room
   roomManager.addUserToRoom({ user, joinCode: room.joinCode });
@@ -60,5 +57,8 @@ export const joinRoomHandler = (options: Options) => {
   server.io.to(room.joinCode).emit(RoomEvent.RoomUpdated, room);
 
   // Acknowledge the request
-  ack({ success: true, data: room });
+  ack({
+    success: true,
+    data: room.getClient(session.id)
+  });
 };

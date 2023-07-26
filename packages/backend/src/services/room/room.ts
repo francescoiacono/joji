@@ -1,12 +1,12 @@
-import { Room as RoomInterface } from '@joji/types';
 import { RoomUser } from '@/services';
+import { RoomClient } from '@joji/types';
 
 interface RoomOptions {
   joinCode: string;
   host: RoomUser;
 }
 
-export class Room implements RoomInterface {
+export class Room {
   public joinCode: string;
   public host: RoomUser;
   public users: Array<RoomUser> = [];
@@ -58,5 +58,17 @@ export class Room implements RoomInterface {
     return this.users.some(
       u => u.displayName.toLowerCase() === displayName.toLowerCase()
     );
+  }
+
+  /**
+   * Returns the room data for the client
+   */
+  public getClient(sessionId?: RoomUser['sessionId']): RoomClient {
+    return {
+      joinCode: this.joinCode,
+      host: this.host.getClient(),
+      users: this.users.map(u => u.getClient()),
+      isUserInRoom: this.users.some(u => u.sessionId === sessionId)
+    };
   }
 }
