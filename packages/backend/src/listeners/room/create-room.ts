@@ -1,7 +1,7 @@
 import { RoomUser, Room } from '@/services';
 import { logger } from '@/utils';
-import { RoomConfig } from '@joji/config';
 import { RoomMessage } from '@joji/types';
+import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
 interface Data {
@@ -24,19 +24,17 @@ export const createRoomHandler = (options: Options) => {
     return ack({ success: false, error: RoomMessage.AlreadyInRoom });
   }
 
-  // Make sure the username is valid
-  if (!data.hostName?.trim()) {
-    return ack({ success: false, error: RoomMessage.UsernameRequired });
-  }
-  if (data.hostName.length > RoomConfig.username.maxLength) {
-    return ack({ success: false, error: RoomMessage.UsernameTooLong });
+  // Make sure the display name is valid
+  const displayNameError = validateDisplayName(data.hostName);
+  if (displayNameError) {
+    return ack({ success: false, error: displayNameError });
   }
 
   // Create a room with the session
   // This will also add the session to the room
   const host = new RoomUser({
     sessionId: session.id,
-    displayName: data.hostName
+    displayName: data.hostName!
   });
   const room = roomManager.createRoom({ host });
 
