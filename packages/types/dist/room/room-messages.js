@@ -7,4 +7,5 @@ var RoomMessage;
     RoomMessage["DisplayNameTaken"] = "DISPLAY_NAME_TAKEN";
     RoomMessage["DisplayNameTooLong"] = "DISPLAY_NAME_TOO_LONG";
     RoomMessage["AlreadyInRoom"] = "ALREADY_IN_ROOM";
+    RoomMessage["RoomNotFound"] = "ROOM_NOT_FOUND";
 })(RoomMessage = exports.RoomMessage || (exports.RoomMessage = {}));

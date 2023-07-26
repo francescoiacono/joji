@@ -9,4 +9,5 @@ var RoomEvent;
     RoomEvent["JoinRoom"] = "JOIN_ROOM";
     RoomEvent["LeaveRoom"] = "LEAVE_ROOM";
     // Server -> Client
+    RoomEvent["RoomUpdated"] = "ROOM_UPDATED";
 })(RoomEvent = exports.RoomEvent || (exports.RoomEvent = {}));

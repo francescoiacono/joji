@@ -5,7 +5,7 @@ import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
 interface Data {
-  hostName?: string;
+  displayName?: string;
 }
 type Response = Room | null;
 type Options = HandlerOptions<Data, Response>;
@@ -17,7 +17,7 @@ export const createRoomHandler = (options: Options) => {
   logger.debug('createRoomHandler', { socketId: socket.id });
 
   // Get the session from the server
-  const session = sessionManager.getSession(socket);
+  const session = sessionManager.getSessionBySocket(socket);
 
   // Make sure the session isn't already in a room
   if (roomManager.getUserRoom(session.id)) {
@@ -25,7 +25,7 @@ export const createRoomHandler = (options: Options) => {
   }
 
   // Make sure the display name is valid
-  const displayNameError = validateDisplayName(data.hostName);
+  const displayNameError = validateDisplayName(data.displayName);
   if (displayNameError) {
     return ack({ success: false, error: displayNameError });
   }
@@ -34,7 +34,7 @@ export const createRoomHandler = (options: Options) => {
   // This will also add the session to the room
   const host = new RoomUser({
     sessionId: session.id,
-    displayName: data.hostName!
+    displayName: data.displayName!
   });
   const room = roomManager.createRoom({ host });
 

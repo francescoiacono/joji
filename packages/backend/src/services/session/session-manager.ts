@@ -13,8 +13,8 @@ export class SessionManager {
    * Returns the existing session for the given socket.
    * If the socket does not have a session, a new one is created
    */
-  public getSession(socket: Socket): Session {
-    const existingSessionId = this.getSessionIdFromSocket(socket);
+  public getSessionBySocket(socket: Socket): Session {
+    const existingSessionId = this.getSocketSessionId(socket);
 
     if (existingSessionId) {
       const existingSession = this.sessions.get(existingSessionId);
@@ -27,10 +27,17 @@ export class SessionManager {
   }
 
   /**
+   * Returns the socket associated with the given session ID
+   */
+  public getSessionById(sessionId: Session['id']): Session | undefined {
+    return this.sessions.get(sessionId);
+  }
+
+  /**
    * Deletes the session for the given socket
    */
   public deleteSession(socket: Socket): void {
-    const sessionId = this.getSessionIdFromSocket(socket);
+    const sessionId = this.getSocketSessionId(socket);
     if (sessionId) {
       this.sessions.delete(sessionId);
     }
@@ -53,7 +60,7 @@ export class SessionManager {
   /**
    * Returns the session ID associated with the given socket.
    */
-  public getSessionIdFromSocket(socket: Socket): string | undefined {
+  private getSocketSessionId(socket: Socket): string | undefined {
     return socket.handshake.auth.sessionId;
   }
 

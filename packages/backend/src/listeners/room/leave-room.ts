@@ -12,7 +12,7 @@ export const leaveRoomHandler = (options: Options) => {
   logger.debug('leaveRoomHandler', { socketId: socket.id });
 
   // Get the session from the server
-  const session = sessionManager.getSession(socket);
+  const session = sessionManager.getSessionBySocket(socket);
 
   // Remove the user from the room
   const room = roomManager.removeUserFromRoom(session.id);

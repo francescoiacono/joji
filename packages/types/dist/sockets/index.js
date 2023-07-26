@@ -15,4 +15,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./socket-events"), exports);
+__exportStar(require("./socket-messages"), exports);
 __exportStar(require("./socket-response"), exports);

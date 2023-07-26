@@ -14,8 +14,6 @@ export class Room implements RoomInterface {
   constructor(options: RoomOptions) {
     this.joinCode = options.joinCode;
     this.host = options.host;
-
-    this.addUser(this.host);
   }
 
   /**
@@ -51,5 +49,14 @@ export class Room implements RoomInterface {
    */
   public setHost(user: RoomUser): void {
     this.host = user;
+  }
+
+  /**
+   * Returns if a display name is taken
+   */
+  public isDisplayNameTaken(displayName: RoomUser['displayName']): boolean {
+    return this.users.some(
+      u => u.displayName.toLowerCase() === displayName.toLowerCase()
+    );
   }
 }
