@@ -1,9 +1,11 @@
+import { RoomUser as RoomUserInterface } from '@joji/types';
+
 interface RoomUserOptions {
   sessionId: string;
   displayName: string;
 }
 
-export class RoomUser {
+export class RoomUser implements RoomUserInterface {
   public sessionId: string;
   public displayName: string;
 

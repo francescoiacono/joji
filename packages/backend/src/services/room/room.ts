@@ -1,3 +1,4 @@
+import { Room as RoomInterface } from '@joji/types';
 import { RoomUser } from '@/services';
 
 interface RoomOptions {
@@ -5,7 +6,7 @@ interface RoomOptions {
   host: RoomUser;
 }
 
-export class Room {
+export class Room implements RoomInterface {
   public joinCode: string;
   public host: RoomUser;
   public users: Array<RoomUser> = [];
