@@ -1,12 +1,7 @@
-import { SocketProvider } from '@/providers';
 import CreateRoomForm from './subcomponents/createRoomForm/createRoomForm';
 
 const Home = () => {
-  return (
-    <SocketProvider>
-      <CreateRoomForm />
-    </SocketProvider>
-  );
+  return <CreateRoomForm />;
 };
 
 export default Home;

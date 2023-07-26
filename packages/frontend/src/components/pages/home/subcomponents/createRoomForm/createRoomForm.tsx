@@ -29,7 +29,7 @@ const CreateRoomForm = () => {
     }
 
     if (formState.data) {
-      router.push(`/room/${formState.data.id}`);
+      router.push(`/room/${formState.data.joinCode}`);
     }
   }, [socket, formState.data]);
 
