@@ -1,19 +1,17 @@
-import { Socket } from 'socket.io';
-import { Server, RoomUser } from '@/services';
-import { logger, socketError } from '@/utils';
+import { RoomUser, Room } from '@/services';
+import { logger } from '@/utils';
 import { RoomConfig } from '@joji/config';
-import { RoomEvent, RoomMessage } from '@joji/types';
+import { RoomMessage } from '@joji/types';
+import { HandlerOptions } from '..';
 
-interface CreateRoomHandlerOptions {
-  server: Server;
-  socket: Socket;
-  data: {
-    hostName?: string;
-  };
+interface Data {
+  hostName?: string;
 }
+type Response = Room | null;
+type Options = HandlerOptions<Data, Response>;
 
-export const createRoomHandler = (options: CreateRoomHandlerOptions) => {
-  const { server, socket, data } = options;
+export const createRoomHandler = (options: Options) => {
+  const { server, socket, data, ack } = options;
   const { sessionManager, roomManager } = server;
 
   logger.debug('createRoomHandler', { socketId: socket.id });
@@ -23,15 +21,15 @@ export const createRoomHandler = (options: CreateRoomHandlerOptions) => {
 
   // Make sure the session isn't already in a room
   if (roomManager.getUserRoom(session.id)) {
-    return socketError(socket, RoomMessage.AlreadyInRoom);
+    return ack({ success: false, error: RoomMessage.AlreadyInRoom });
   }
 
   // Make sure the username is valid
   if (!data.hostName?.trim()) {
-    return socketError(socket, RoomMessage.UsernameRequired);
+    return ack({ success: false, error: RoomMessage.UsernameRequired });
   }
   if (data.hostName.length > RoomConfig.username.maxLength) {
-    return socketError(socket, RoomMessage.UsernameTooLong);
+    return ack({ success: false, error: RoomMessage.UsernameTooLong });
   }
 
   // Create a room with the session
@@ -42,6 +40,6 @@ export const createRoomHandler = (options: CreateRoomHandlerOptions) => {
   });
   const room = roomManager.createRoom({ host });
 
-  // Emit the room created event
-  socket.emit(RoomEvent.RoomCreated, room);
+  // Acknowledge the event with the room
+  return ack({ success: true, data: room });
 };

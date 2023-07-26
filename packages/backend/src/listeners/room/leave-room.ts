@@ -1,15 +1,12 @@
-import { Socket } from 'socket.io';
-import { Server } from '@/services';
-import { RoomEvent } from '@joji/types';
+import { Room } from '@/services';
 import { logger } from '@/utils';
+import { HandlerOptions } from '..';
 
-interface LeaveRoomHandlerOptions {
-  server: Server;
-  socket: Socket;
-}
+type Response = Room | null;
+type Options = HandlerOptions<null, Response>;
 
-export const leaveRoomHandler = (options: LeaveRoomHandlerOptions) => {
-  const { server, socket } = options;
+export const leaveRoomHandler = (options: Options) => {
+  const { server, socket, ack } = options;
   const { sessionManager, roomManager } = server;
 
   logger.debug('leaveRoomHandler', { socketId: socket.id });
@@ -20,6 +17,6 @@ export const leaveRoomHandler = (options: LeaveRoomHandlerOptions) => {
   // Remove the user from the room
   const room = roomManager.removeUserFromRoom(session.id);
 
-  // Emit the room left event
-  socket.emit(RoomEvent.RoomLeft, room);
+  // Acknowledge the event with the room
+  return ack({ success: true, data: room });
 };

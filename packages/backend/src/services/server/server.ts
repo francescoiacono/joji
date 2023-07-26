@@ -40,7 +40,7 @@ export class Server {
 
     // Listen for new connections
     this.io.on('connection', socket => {
-      logger.debug('A user connected');
+      logger.debug('A user connected', { socketId: socket.id });
 
       // Get the session and send it to the client
       const session = this.sessionManager.getSession(socket);

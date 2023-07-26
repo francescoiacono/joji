@@ -1,25 +1,30 @@
-import { RoomEvent } from '@joji/types';
-import { Socket } from 'socket.io';
+import { Server } from '@/services';
+import { RoomEvent, SocketResponse } from '@joji/types';
 import {
   createRoomHandler,
   getRoomByJoinCodeHandler,
-  getRoomHandler,
   leaveRoomHandler
 } from './room';
-import { Server } from '@/services';
+import { Socket } from 'socket.io';
+
+export interface HandlerOptions<TData, TResponse> {
+  server: Server;
+  socket: Socket;
+  data: TData;
+  ack: (res: SocketResponse<TResponse>) => void;
+}
 
 export const listeners = (server: Server, socket: Socket) => {
+  const handler = <TData, TResponse>(
+    handler: (options: HandlerOptions<TData, TResponse>) => void
+  ) => {
+    return (data: TData, ack: (res: SocketResponse<TResponse>) => void) => {
+      handler({ server, socket, data, ack });
+    };
+  };
+
   // Room
-  socket.on(RoomEvent.GetRoom, () => {
-    return getRoomHandler({ server, socket });
-  });
-  socket.on(RoomEvent.GetRoomByJoinCode, data => {
-    return getRoomByJoinCodeHandler({ server, socket, data });
-  });
-  socket.on(RoomEvent.CreateRoom, data => {
-    return createRoomHandler({ server, socket, data });
-  });
-  socket.on(RoomEvent.LeaveRoom, () => {
-    return leaveRoomHandler({ server, socket });
-  });
+  socket.on(RoomEvent.GetRoomByJoinCode, handler(getRoomByJoinCodeHandler));
+  socket.on(RoomEvent.CreateRoom, handler(createRoomHandler));
+  socket.on(RoomEvent.LeaveRoom, handler(leaveRoomHandler));
 };

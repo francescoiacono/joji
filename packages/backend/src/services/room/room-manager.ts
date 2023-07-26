@@ -22,18 +22,19 @@ export class RoomManager {
   /**
    * Returns the room with the given join code
    */
-  public getRoom(joinCode: Room['joinCode']): Room | undefined {
-    return this.rooms.get(joinCode);
+  public getRoom(joinCode: Room['joinCode']): Room | null {
+    return this.rooms.get(joinCode) ?? null;
   }
 
   /**
    * Returns the room that the user with the given session is in
    */
-  public getUserRoom(sessionId: Session['id']): Room | undefined {
+  public getUserRoom(sessionId: Session['id']): Room | null {
     const joinCode = this.roomUsers.get(sessionId);
     if (joinCode) {
-      return this.getRoom(joinCode);
+      return this.getRoom(joinCode) ?? null;
     }
+    return null;
   }
 
   /**
@@ -70,7 +71,7 @@ export class RoomManager {
   /**
    * Adds a user to the room with the given join code
    */
-  public addUserToRoom(options: AddUserToRoomOptions): Room | undefined {
+  public addUserToRoom(options: AddUserToRoomOptions): Room | null {
     const { user, joinCode } = options;
     const room = this.getRoom(joinCode);
     if (room) {
@@ -83,8 +84,9 @@ export class RoomManager {
   /**
    * Removes a user from the room they are in
    */
-  public removeUserFromRoom(sessionId: Session['id']): Room | undefined {
+  public removeUserFromRoom(sessionId: Session['id']): Room | null {
     const room = this.getUserRoom(sessionId);
+    console.log(room);
     if (room) {
       room.removeUser(sessionId);
       this.roomUsers.delete(sessionId);
