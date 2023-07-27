@@ -4,6 +4,7 @@ exports.RoomEvent = void 0;
 var RoomEvent;
 (function (RoomEvent) {
     // Client -> Server
+    RoomEvent["GetRooms"] = "GET_ROOMS";
     RoomEvent["GetRoomByJoinCode"] = "GET_ROOM_BY_JOIN_CODE";
     RoomEvent["CreateRoom"] = "CREATE_ROOM";
     RoomEvent["JoinRoom"] = "JOIN_ROOM";
