@@ -144,7 +144,7 @@ export class RoomManager {
     this.roomUsers.delete(sessionId);
 
     // If the room is empty, delete it
-    if (room.users.length === 1) {
+    if (room.users.length === 0) {
       this.deleteRoom(room.joinCode);
       return null;
     }

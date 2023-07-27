@@ -36,7 +36,9 @@ export const createRoomHandler = (options: Options) => {
     sessionId: session.id,
     displayName: data.displayName!
   });
-  room.addUser(host);
+  roomManager.addUserToRoom(host, room.joinCode);
+
+  // Set the host of the room
   room.setHost(host);
 
   // Acknowledge the event with the room
