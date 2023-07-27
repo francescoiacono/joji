@@ -146,11 +146,12 @@ export class RoomManager {
     // If the room is empty, delete it
     if (room.users.length === 0) {
       this.deleteRoom(room.joinCode);
-    } else {
-      // Reassign the host if the host left
-      if (!room.host || room.host.sessionId === sessionId) {
-        room.setHost(room.users[0]);
-      }
+      return null;
+    }
+
+    // Reassign the host if the host left
+    if (!room.host || room.host.sessionId === sessionId) {
+      this.assignNewHost(room);
     }
 
     // Emit events
@@ -159,6 +160,16 @@ export class RoomManager {
 
     // Return the room
     return room;
+  }
+
+  /**
+   * Assigns a new host to a room
+   */
+  private assignNewHost(room: Room): void {
+    const newHost = room.users[0];
+    if (newHost) {
+      room.setHost(newHost);
+    }
   }
 
   /**
