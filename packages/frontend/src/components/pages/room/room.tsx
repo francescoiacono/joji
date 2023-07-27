@@ -8,9 +8,8 @@ const Room = () => {
   const { room, getRoom } = useRoom();
 
   useEffect(() => {
-    if (!room) {
-      console.log('1', room);
-      getRoom(slug[0]);
+    if (!room && typeof slug === 'string') {
+      getRoom(slug);
     } else {
       console.log('2', room);
     }

@@ -9,8 +9,15 @@ const useRoom = () => {
 
   const router = useRouter();
 
+  /**
+   * Creates a new room with host
+   * @param displayName is the host name
+   */
+
   const createRoom = (displayName: string) => {
-    socket?.emit(
+    if (!socket) return console.error('Socket not initialized');
+
+    socket.emit(
       RoomEvent.CreateRoom,
       { displayName },
       (response: SocketResponse<RoomClient>) => {
@@ -26,8 +33,17 @@ const useRoom = () => {
     );
   };
 
+  /**
+   * Gets a room by join code
+   * @param joinCode
+   */
+
   const getRoom = (joinCode: string) => {
-    socket?.emit(
+    if (!socket) return console.error('Socket not initialized');
+
+    console.log('Joining room with code:', joinCode);
+
+    socket.emit(
       RoomEvent.GetRoomByJoinCode,
       { joinCode },
       (response: SocketResponse<RoomClient>) => {
@@ -35,7 +51,7 @@ const useRoom = () => {
           const { error } = response;
           console.error('Error:', error);
         } else {
-          console.log(response);
+          console.log('Success:', response);
           const room = response.data;
           setRoom(room);
         }

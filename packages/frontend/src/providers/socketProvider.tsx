@@ -19,6 +19,7 @@ interface SocketProviderProps {
 
 export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     initialiseSocket();
@@ -44,7 +45,10 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
     }
 
     setSocket(socketInstance);
+    setLoading(false);
   };
+
+  if (loading && !socket) return <p>Loading...</p>;
 
   return (
     <SocketContext.Provider value={{ socket, setSocket }}>
