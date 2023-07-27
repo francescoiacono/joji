@@ -36,6 +36,13 @@ export class RoomManager {
   }
 
   /**
+   * Returns all rooms
+   */
+  public getRooms(): Array<Room> {
+    return Array.from(this.rooms.values());
+  }
+
+  /**
    * Returns the room that the user with the given session is in
    */
   public getUserRoom(sessionId: Session['id']): Room | null {

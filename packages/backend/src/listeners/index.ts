@@ -3,6 +3,7 @@ import { RoomEvent, SocketResponse } from '@joji/types';
 import {
   createRoomHandler,
   getRoomByJoinCodeHandler,
+  getRoomsHandler,
   joinRoomHandler,
   leaveRoomHandler
 } from './room';
@@ -27,6 +28,7 @@ export const listeners = (server: Server, socket: Socket) => {
   };
 
   // Room
+  socket.on(RoomEvent.GetRooms, handler(getRoomsHandler));
   socket.on(RoomEvent.GetRoomByJoinCode, handler(getRoomByJoinCodeHandler));
   socket.on(RoomEvent.CreateRoom, handler(createRoomHandler));
   socket.on(RoomEvent.LeaveRoom, handler(leaveRoomHandler));
