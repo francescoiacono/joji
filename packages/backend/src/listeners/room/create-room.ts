@@ -1,47 +1,46 @@
-import { Socket } from 'socket.io';
-import { Server, RoomUser } from '@/services';
-import { logger, socketError } from '@/utils';
-import { RoomConfig } from '@joji/config';
-import { RoomEvent, RoomMessage } from '@joji/types';
+import { RoomUser } from '@/services';
+import { logger } from '@/utils';
+import { RoomClient, RoomMessage } from '@joji/types';
+import { validateDisplayName } from '@/validators';
+import { HandlerOptions } from '..';
 
-interface CreateRoomHandlerOptions {
-  server: Server;
-  socket: Socket;
-  data: {
-    hostName?: string;
-  };
+interface Data {
+  displayName?: string;
 }
+type Response = RoomClient | null;
+type Options = HandlerOptions<Data, Response>;
 
-export const createRoomHandler = (options: CreateRoomHandlerOptions) => {
-  const { server, socket, data } = options;
+export const createRoomHandler = (options: Options) => {
+  const { server, socket, data, ack } = options;
   const { sessionManager, roomManager } = server;
 
   logger.debug('createRoomHandler', { socketId: socket.id });
 
   // Get the session from the server
-  const session = sessionManager.getSession(socket);
+  const session = sessionManager.getSessionBySocket(socket);
 
   // Make sure the session isn't already in a room
   if (roomManager.getUserRoom(session.id)) {
-    return socketError(socket, RoomMessage.AlreadyInRoom);
+    return ack({ success: false, error: RoomMessage.AlreadyInRoom });
   }
 
-  // Make sure the username is valid
-  if (!data.hostName?.trim()) {
-    return socketError(socket, RoomMessage.UsernameRequired);
-  }
-  if (data.hostName.length > RoomConfig.username.maxLength) {
-    return socketError(socket, RoomMessage.UsernameTooLong);
+  // Make sure the display name is valid
+  const displayNameError = validateDisplayName(data.displayName);
+  if (displayNameError) {
+    return ack({ success: false, error: displayNameError });
   }
 
   // Create a room with the session
   // This will also add the session to the room
   const host = new RoomUser({
     sessionId: session.id,
-    displayName: data.hostName
+    displayName: data.displayName!
   });
   const room = roomManager.createRoom({ host });
 
-  // Emit the room created event
-  socket.emit(RoomEvent.RoomCreated, room);
+  // Acknowledge the event with the room
+  return ack({
+    success: true,
+    data: room.getClient(session.id)
+  });
 };

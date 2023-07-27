@@ -1,4 +1,5 @@
 import { RoomUser } from '@/services';
+import { RoomClient } from '@joji/types';
 
 interface RoomOptions {
   joinCode: string;
@@ -13,8 +14,6 @@ export class Room {
   constructor(options: RoomOptions) {
     this.joinCode = options.joinCode;
     this.host = options.host;
-
-    this.addUser(this.host);
   }
 
   /**
@@ -50,5 +49,26 @@ export class Room {
    */
   public setHost(user: RoomUser): void {
     this.host = user;
+  }
+
+  /**
+   * Returns if a display name is taken
+   */
+  public isDisplayNameTaken(displayName: RoomUser['displayName']): boolean {
+    return this.users.some(
+      u => u.displayName.toLowerCase() === displayName.toLowerCase()
+    );
+  }
+
+  /**
+   * Returns the room data for the client
+   */
+  public getClient(sessionId?: RoomUser['sessionId']): RoomClient {
+    return {
+      joinCode: this.joinCode,
+      host: this.host.getClient(),
+      users: this.users.map(u => u.getClient()),
+      isUserInRoom: this.users.some(u => u.sessionId === sessionId)
+    };
   }
 }

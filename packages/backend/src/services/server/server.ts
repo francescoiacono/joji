@@ -1,35 +1,22 @@
 import { RoomManager, SessionManager } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
-import { RoomEvent } from '@joji/types';
-import {
-  createRoomHandler,
-  getRoomByJoinCodeHandler,
-  getRoomHandler,
-  leaveRoomHandler
-} from '@/listeners';
+import { SocketEvent } from '@joji/types';
+import { listeners } from '@/listeners';
 
 interface ServerStartOptions {
   port?: number;
 }
 
-/**
- * This class encapsulates the Socket.IO server
- */
 export class Server {
   public sessionManager: SessionManager;
   public roomManager: RoomManager;
-  private io: IOServer;
+  public io: IOServer;
 
   constructor() {
-    this.io = new IOServer({
-      cors: {
-        origin: process.env.CLIENT_URL,
-        methods: ['GET']
-      }
-    });
-    this.sessionManager = new SessionManager();
-    this.roomManager = new RoomManager();
+    this.io = this.createIOServer();
+    this.sessionManager = this.createSessionManager();
+    this.roomManager = this.createRoomManager();
   }
 
   /**
@@ -45,21 +32,14 @@ export class Server {
 
     // Listen for new connections
     this.io.on('connection', socket => {
-      logger.debug('A user connected');
+      logger.debug('A user connected', { socketId: socket.id });
+
+      // Get the session and send it to the client
+      const session = this.sessionManager.getSessionBySocket(socket);
+      socket.emit(SocketEvent.Session, session);
 
       // Listen for events
-      socket.on(RoomEvent.GetRoom, () =>
-        getRoomHandler({ server: this, socket })
-      );
-      socket.on(RoomEvent.GetRoomByJoinCode, data =>
-        getRoomByJoinCodeHandler({ server: this, socket, data })
-      );
-      socket.on(RoomEvent.CreateRoom, data =>
-        createRoomHandler({ server: this, socket, data })
-      );
-      socket.on(RoomEvent.LeaveRoom, () =>
-        leaveRoomHandler({ server: this, socket })
-      );
+      listeners(this, socket);
 
       // Handle the disconnect event
       socket.on('disconnect', () => {
@@ -72,5 +52,54 @@ export class Server {
     this.io.on('error', error => {
       logger.error(`Server error: ${error}`);
     });
+  }
+
+  /**
+   * Creates a new Socket.IO server
+   */
+  private createIOServer(): IOServer {
+    return new IOServer({
+      cors: {
+        origin: process.env.CLIENT_URL,
+        methods: ['GET']
+      }
+    });
+  }
+
+  /**
+   * Creates a new session manager
+   */
+  private createSessionManager(): SessionManager {
+    return new SessionManager();
+  }
+
+  /**
+   * Creates a new room manager
+   */
+  private createRoomManager(): RoomManager {
+    return new RoomManager({
+      onUserAddedToRoom: this.handleUserAddedToRoom.bind(this),
+      onUserRemovedFromRoom: this.handleUserRemovedFromRoom.bind(this)
+    });
+  }
+
+  /**
+   * Handles the user added to room event
+   */
+  private handleUserAddedToRoom(sessionId: string, roomJoinCode: string) {
+    const { socketId } = this.sessionManager.getSessionById(sessionId) || {};
+    if (socketId) {
+      this.io.sockets.sockets.get(socketId)?.join(roomJoinCode);
+    }
+  }
+
+  /**
+   * Handles the user removed from room event
+   */
+  private handleUserRemovedFromRoom(sessionId: string, roomJoinCode: string) {
+    const { socketId } = this.sessionManager.getSessionById(sessionId) || {};
+    if (socketId) {
+      this.io.sockets.sockets.get(socketId)?.leave(roomJoinCode);
+    }
   }
 }

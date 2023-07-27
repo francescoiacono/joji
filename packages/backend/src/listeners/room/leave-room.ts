@@ -1,25 +1,22 @@
-import { Socket } from 'socket.io';
-import { Server } from '@/services';
-import { RoomEvent } from '@joji/types';
 import { logger } from '@/utils';
+import { HandlerOptions } from '..';
+import { RoomClient } from '@joji/types';
 
-interface LeaveRoomHandlerOptions {
-  server: Server;
-  socket: Socket;
-}
+type Response = RoomClient | null;
+type Options = HandlerOptions<null, Response>;
 
-export const leaveRoomHandler = (options: LeaveRoomHandlerOptions) => {
-  const { server, socket } = options;
-  const { sessionManager, roomManager } = server;
+export const leaveRoomHandler = (options: Options) => {
+  const { server, socket, session, ack } = options;
+  const { roomManager } = server;
 
   logger.debug('leaveRoomHandler', { socketId: socket.id });
-
-  // Get the session from the server
-  const session = sessionManager.getSession(socket);
 
   // Remove the user from the room
   const room = roomManager.removeUserFromRoom(session.id);
 
-  // Emit the room left event
-  socket.emit(RoomEvent.RoomLeft, room);
+  // Acknowledge the event with the room
+  return ack({
+    success: true,
+    data: room?.getClient(session.id) ?? null
+  });
 };

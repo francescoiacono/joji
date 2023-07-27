@@ -2,6 +2,11 @@ import { randomString } from '@/utils';
 import { RoomUser, Session } from '@/services';
 import { Room } from './room';
 
+interface RoomManagerOptions {
+  onUserAddedToRoom?: (sessionId: string, roomCode: string) => void;
+  onUserRemovedFromRoom?: (sessionId: string, roomCode: string) => void;
+}
+
 interface CreateRoomOptions {
   host: RoomUser;
 }
@@ -13,27 +18,32 @@ interface AddUserToRoomOptions {
 export class RoomManager {
   private rooms: Map<Room['joinCode'], Room>;
   private roomUsers: Map<Session['id'], Room['joinCode']>;
+  private onUserAddedToRoom?: (sessionId: string, roomCode: string) => void;
+  private onUserRemovedFromRoom?: (sessionId: string, roomCode: string) => void;
 
-  constructor() {
+  constructor(options?: RoomManagerOptions) {
     this.rooms = new Map();
     this.roomUsers = new Map();
+    this.onUserAddedToRoom = options?.onUserAddedToRoom;
+    this.onUserRemovedFromRoom = options?.onUserRemovedFromRoom;
   }
 
   /**
    * Returns the room with the given join code
    */
-  public getRoom(joinCode: Room['joinCode']): Room | undefined {
-    return this.rooms.get(joinCode);
+  public getRoom(joinCode: Room['joinCode']): Room | null {
+    return this.rooms.get(joinCode) ?? null;
   }
 
   /**
    * Returns the room that the user with the given session is in
    */
-  public getUserRoom(sessionId: Session['id']): Room | undefined {
+  public getUserRoom(sessionId: Session['id']): Room | null {
     const joinCode = this.roomUsers.get(sessionId);
     if (joinCode) {
-      return this.getRoom(joinCode);
+      return this.getRoom(joinCode) ?? null;
     }
+    return null;
   }
 
   /**
@@ -46,7 +56,7 @@ export class RoomManager {
     const room = new Room({ joinCode, host });
 
     this.rooms.set(room.joinCode, room);
-    this.roomUsers.set(host.sessionId, room.joinCode);
+    this.addUserToRoom({ user: host, joinCode: room.joinCode });
 
     return room;
   }
@@ -70,12 +80,17 @@ export class RoomManager {
   /**
    * Adds a user to the room with the given join code
    */
-  public addUserToRoom(options: AddUserToRoomOptions): Room | undefined {
+  public addUserToRoom(options: AddUserToRoomOptions): Room | null {
     const { user, joinCode } = options;
     const room = this.getRoom(joinCode);
     if (room) {
       room.addUser(user);
       this.roomUsers.set(user.sessionId, room.joinCode);
+
+      // Call the onUserAddedToRoom callback
+      if (this.onUserAddedToRoom) {
+        this.onUserAddedToRoom(user.sessionId, room.joinCode);
+      }
     }
     return room;
   }
@@ -83,8 +98,9 @@ export class RoomManager {
   /**
    * Removes a user from the room they are in
    */
-  public removeUserFromRoom(sessionId: Session['id']): Room | undefined {
+  public removeUserFromRoom(sessionId: Session['id']): Room | null {
     const room = this.getUserRoom(sessionId);
+    console.log(room);
     if (room) {
       room.removeUser(sessionId);
       this.roomUsers.delete(sessionId);
@@ -100,6 +116,11 @@ export class RoomManager {
       // If the room is empty after re-assigning the host, delete it
       if (room.users.length === 0) {
         this.deleteRoom(room.joinCode);
+      }
+
+      // Call the onUserRemovedFromRoom callback
+      if (this.onUserRemovedFromRoom) {
+        this.onUserRemovedFromRoom(sessionId, room.joinCode);
       }
     }
     return room;
