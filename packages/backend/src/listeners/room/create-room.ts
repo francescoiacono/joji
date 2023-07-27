@@ -1,6 +1,6 @@
-import { RoomUser } from '@/services';
+import { RoomEvents, RoomUser } from '@/services';
 import { logger } from '@/utils';
-import { RoomClient } from '@joji/types';
+import { RoomClient, RoomEvent } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
@@ -26,7 +26,7 @@ export const createRoomHandler = (options: Options) => {
   }
 
   // Remove the user from their current room, if they are in one
-  roomManager.removeUserFromRoom(session.id);
+  roomManager.getUserRoom(session.id)?.removeUser(session.id);
 
   // Create a room
   const room = roomManager.createRoom();
@@ -36,10 +36,23 @@ export const createRoomHandler = (options: Options) => {
     sessionId: session.id,
     displayName: data.displayName!
   });
-  roomManager.addUserToRoom(host, room.joinCode);
+  room.addUser(host);
 
   // Set the host of the room
   room.setHost(host);
+
+  // Subscribe to room events
+  const onRoomUpdated = () => {
+    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.id));
+  };
+  const onUserRemoved: RoomEvents['userRemoved'] = data => {
+    if (data.user.sessionId === session.id) {
+      room.events.off('roomUpdated', onRoomUpdated);
+      room.events.off('userRemoved', onUserRemoved);
+    }
+  };
+  room.events.on('roomUpdated', onRoomUpdated);
+  room.events.on('userRemoved', onUserRemoved);
 
   // Acknowledge the event with the room
   return ack({

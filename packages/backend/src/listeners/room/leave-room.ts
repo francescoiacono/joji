@@ -12,11 +12,11 @@ export const leaveRoomHandler = (options: Options) => {
   logger.debug('leaveRoomHandler', { socketId: socket.id });
 
   // Remove the user from the room
-  const room = roomManager.removeUserFromRoom(session.id);
+  roomManager.getUserRoom(session.id)?.removeUser(session.id);
 
   // Acknowledge the event with the room
   return ack({
     success: true,
-    data: room?.getClient(session.id) ?? null
+    data: null
   });
 };

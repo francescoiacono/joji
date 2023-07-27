@@ -48,7 +48,7 @@ export class SessionManager {
    * and returns the session
    */
   private createSession(socket: Socket): Session {
-    const id = this.generateSessionId();
+    const id = this.generateSessionId(socket);
     const session = new Session({ id, socketId: socket.id });
 
     this.sessions.set(id, session);
@@ -67,7 +67,12 @@ export class SessionManager {
   /**
    * Generates a random session ID
    */
-  private generateSessionId(): string {
+  private generateSessionId(socket: Socket): string {
+    // If we're in development, allow the client to specify a session ID
+    if (process.env.NODE_ENV === 'development') {
+      return (socket.handshake.headers.session as string) || uuidv4();
+    }
+
     return uuidv4();
   }
 }
