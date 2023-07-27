@@ -1,6 +1,5 @@
 import { Game } from '@/services';
-import { DeathrollOptions } from './deathroll-options';
-import { GameType } from '@joji/types';
+import { DeathrollOptions, GameType } from '@joji/types';
 
 export class Deathroll extends Game<DeathrollOptions> {
   type: GameType = GameType.Deathroll;

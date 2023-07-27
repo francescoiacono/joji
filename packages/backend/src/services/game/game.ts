@@ -1,5 +1,4 @@
-import { GameClient, GameStatus, GameType } from '@joji/types';
-import { GameOptions } from './game-options';
+import { GameClient, GameOptions, GameStatus, GameType } from '@joji/types';
 
 export abstract class Game<TOptions extends GameOptions = GameOptions> {
   abstract type: GameType;
@@ -34,10 +33,11 @@ export abstract class Game<TOptions extends GameOptions = GameOptions> {
   /**
    * Returns the game object, formatted for the client
    */
-  public getClient(): GameClient {
+  public getClient(): GameClient<TOptions> {
     return {
       type: this.type,
-      status: this.status
+      status: this.status,
+      options: this.options
     };
   }
 
