@@ -1,5 +1,5 @@
 import { HandlerOptions } from '..';
-import { GameType, RoomClient, RoomMessage } from '@joji/types';
+import { GameStatus, GameType, RoomClient, RoomMessage } from '@joji/types';
 import { Deathroll } from '@/games';
 
 interface Data {
@@ -22,6 +22,11 @@ export const setGameHandler = (options: Options) => {
   // Make sure the user is the host
   if (!room.isHost(session.id)) {
     return ack({ success: false, error: RoomMessage.NotHost });
+  }
+
+  // Make sure the game isn't in progress
+  if (room.game && room.game.getStatus() !== GameStatus.Waiting) {
+    return ack({ success: false, error: RoomMessage.GameInProgress });
   }
 
   // Create the game

@@ -1,9 +1,9 @@
-import { GameType } from '@joji/types';
 import { Game } from '@/services';
 import { DeathrollOptions } from './deathroll-options';
+import { GameType } from '@joji/types';
 
 export class Deathroll extends Game<DeathrollOptions> {
-  type: GameType = 'deathroll';
+  type: GameType = GameType.Deathroll;
   private startingValue: number;
 
   constructor(options?: DeathrollOptions) {

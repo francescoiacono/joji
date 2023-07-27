@@ -6,5 +6,6 @@ export declare enum RoomMessage {
     AlreadyInRoom = "ALREADY_IN_ROOM",
     RoomNotFound = "ROOM_NOT_FOUND",
     GameNotFound = "GAME_NOT_FOUND",
+    GameInProgress = "GAME_IN_PROGRESS",
     NotHost = "NOT_HOST"
 }
