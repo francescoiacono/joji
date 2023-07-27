@@ -1,45 +1,24 @@
 'use client';
-
-import { useSocket } from '@/providers';
-import { RoomEvent } from '@joji/types';
+import useRoom from '@/hooks/useRoom';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const Room = () => {
-  const [roomState, setRoomState] = useState(() => {
-    const storedData = localStorage.getItem('roomData');
-    return {
-      error: '',
-      loading: storedData ? false : true,
-      data: storedData ? JSON.parse(storedData) : null
-    };
-  });
-
-  const { slug } = useParams();
-  const { socket } = useSocket();
+  let { slug } = useParams();
+  const { room, getRoom } = useRoom();
 
   useEffect(() => {
-    if (!roomState.data) {
-      handleListeners();
+    if (!room) {
+      console.log('1', room);
+      getRoom(slug[0]);
+    } else {
+      console.log('2', room);
     }
-  }, [socket]);
-
-  const handleListeners = () => {
-    socket?.emit(RoomEvent.GetRoom, { joinCode: slug });
-    socket?.on(RoomEvent.Room, data => {
-      setRoomState({ ...roomState, data, loading: false });
-      localStorage.setItem('roomData', JSON.stringify(data));
-    });
-  };
+  }, [room]);
 
   return (
     <section>
       <h1>Room {slug}</h1>
-      {roomState.loading ? (
-        <p>Loading...</p>
-      ) : (
-        <p>Room {JSON.stringify(roomState.data)}</p>
-      )}
     </section>
   );
 };

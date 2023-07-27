@@ -1,4 +1,5 @@
 'use client';
+import { SocketEvent } from '@joji/types';
 import { FC, createContext, useContext, useEffect, useState } from 'react';
 import { Socket, io } from 'socket.io-client';
 
@@ -25,11 +26,24 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
 
   const initialiseSocket = () => {
     const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+    const sessionId = localStorage.getItem('sessionId');
+
     if (!serverUrl) {
       console.error('Server URL not provided');
-    } else {
-      setSocket(io(serverUrl));
+      return;
     }
+
+    const socketOptions = sessionId ? { auth: { sessionId } } : {};
+
+    const socketInstance = io(serverUrl, socketOptions);
+
+    if (!sessionId) {
+      socketInstance.on(SocketEvent.Session, session => {
+        localStorage.setItem('sessionId', session.id);
+      });
+    }
+
+    setSocket(socketInstance);
   };
 
   return (
