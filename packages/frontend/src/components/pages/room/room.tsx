@@ -7,7 +7,7 @@ import { useRoom } from '@/providers';
 
 const Room = () => {
   let { slug } = useParams();
-  const { room, loading, getRoom, joinRoom } = useRoom();
+  const { room, loading, getRoom, joinRoom, leaveRoom } = useRoom();
 
   useEffect(() => {
     if (typeof slug === 'string') {
@@ -20,14 +20,18 @@ const Room = () => {
   return (
     <>
       {room && room?.isUserInRoom ? (
-        <section>
-          <h1>Room {slug}</h1>
-          <ul>
-            {room.users.map((user, i) => (
-              <li key={i}>{user.displayName}</li>
-            ))}
-          </ul>
-        </section>
+        <>
+          <section>
+            <h1>Room {slug}</h1>
+            <ul>
+              {room.users.map((user, i) => (
+                <li key={i}>{user.displayName}</li>
+              ))}
+            </ul>
+          </section>
+
+          <button onClick={() => leaveRoom()}>Leave Room</button>
+        </>
       ) : (
         <JoinRoomForm joinRoom={joinRoom} />
       )}

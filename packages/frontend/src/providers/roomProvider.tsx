@@ -11,6 +11,7 @@ interface RoomContextProps {
   createRoom: (displayName: string) => void;
   getRoom: (slug: string) => void;
   joinRoom: (slug: string, displayName: string) => void;
+  leaveRoom: () => void;
 }
 
 const RoomContext = createContext<RoomContextProps>({
@@ -18,7 +19,8 @@ const RoomContext = createContext<RoomContextProps>({
   loading: true,
   getRoom: () => {},
   createRoom: () => {},
-  joinRoom: () => {}
+  joinRoom: () => {},
+  leaveRoom: () => {}
 });
 
 interface RoomProviderProps {
@@ -34,7 +36,11 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
 
   useEffect(() => {
     listenForRoomUpdates();
-  }, []);
+
+    return () => {
+      socket?.off(RoomEvent.RoomUpdated);
+    };
+  }, [socket]);
 
   const listenForRoomUpdates = () => {
     if (!socket) return console.error('Socket not initialized');
@@ -99,6 +105,8 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
 
   /**
    * Joins a room by room code
+   * @param roomCode is the join code of the room
+   * @param displayName is the name of the user
    *
    */
 
@@ -124,6 +132,32 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
     );
   };
 
+  /**
+   * Leaves a room
+   *
+   */
+
+  const leaveRoom = () => {
+    if (!socket) return console.error('Socket not initialized');
+
+    setLoading(true);
+    socket.emit(
+      RoomEvent.LeaveRoom,
+      {},
+      (response: SocketResponse<RoomClient>) => {
+        if (!response.success) {
+          const { error } = response;
+          console.error('Error:', error);
+        } else {
+          console.log('[LEAVE ROOM]:', response.data);
+          const room = response.data;
+          setRoom(room);
+        }
+        setLoading(false);
+      }
+    );
+  };
+
   return (
     <RoomContext.Provider
       value={{
@@ -131,7 +165,8 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
         loading,
         getRoom,
         createRoom,
-        joinRoom
+        joinRoom,
+        leaveRoom
       }}
     >
       {children}
