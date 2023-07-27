@@ -5,6 +5,7 @@ import { Room } from './room';
 interface RoomManagerOptions {
   onUserAddedToRoom?: (sessionId: string, roomCode: string) => void;
   onUserRemovedFromRoom?: (sessionId: string, roomCode: string) => void;
+  onRoomUpdated?: (room: Room) => void;
 }
 
 interface CreateRoomOptions {
@@ -20,12 +21,14 @@ export class RoomManager {
   private roomUsers: Map<Session['id'], Room['joinCode']>;
   private onUserAddedToRoom?: (sessionId: string, roomCode: string) => void;
   private onUserRemovedFromRoom?: (sessionId: string, roomCode: string) => void;
+  private onRoomUpdated?: (room: Room) => void;
 
   constructor(options?: RoomManagerOptions) {
     this.rooms = new Map();
     this.roomUsers = new Map();
     this.onUserAddedToRoom = options?.onUserAddedToRoom;
     this.onUserRemovedFromRoom = options?.onUserRemovedFromRoom;
+    this.onRoomUpdated = options?.onRoomUpdated;
   }
 
   /**
@@ -98,6 +101,11 @@ export class RoomManager {
       if (this.onUserAddedToRoom) {
         this.onUserAddedToRoom(user.sessionId, room.joinCode);
       }
+
+      // Call the onRoomUpdated callback
+      if (this.onRoomUpdated) {
+        this.onRoomUpdated(room);
+      }
     }
     return room;
   }
@@ -128,6 +136,11 @@ export class RoomManager {
       // Call the onUserRemovedFromRoom callback
       if (this.onUserRemovedFromRoom) {
         this.onUserRemovedFromRoom(sessionId, room.joinCode);
+      }
+
+      // Call the onRoomUpdated callback
+      if (this.onRoomUpdated) {
+        this.onRoomUpdated(room);
       }
     }
     return room;

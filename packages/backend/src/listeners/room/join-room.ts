@@ -1,6 +1,6 @@
 import { RoomUser } from '@/services';
 import { logger } from '@/utils';
-import { RoomClient, RoomEvent, RoomMessage, SocketMessage } from '@joji/types';
+import { RoomClient, RoomMessage, SocketMessage } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
@@ -52,11 +52,6 @@ export const joinRoomHandler = (options: Options) => {
 
   // Add the user to the room
   roomManager.addUserToRoom({ user, joinCode: room.joinCode });
-
-  // Send an update to the room
-  server.io
-    .to(room.joinCode)
-    .emit(RoomEvent.RoomUpdated, room.getClient(session.id));
 
   // Acknowledge the request
   ack({

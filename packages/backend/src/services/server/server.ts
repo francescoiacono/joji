@@ -1,7 +1,7 @@
-import { RoomManager, SessionManager } from '@/services';
+import { Room, RoomManager, SessionManager } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
-import { SocketEvent } from '@joji/types';
+import { RoomEvent, SocketEvent } from '@joji/types';
 import { listeners } from '@/listeners';
 
 interface ServerStartOptions {
@@ -79,7 +79,8 @@ export class Server {
   private createRoomManager(): RoomManager {
     return new RoomManager({
       onUserAddedToRoom: this.handleUserAddedToRoom.bind(this),
-      onUserRemovedFromRoom: this.handleUserRemovedFromRoom.bind(this)
+      onUserRemovedFromRoom: this.handleUserRemovedFromRoom.bind(this),
+      onRoomUpdated: this.handleRoomUpdated.bind(this)
     });
   }
 
@@ -101,5 +102,20 @@ export class Server {
     if (socketId) {
       this.io.sockets.sockets.get(socketId)?.leave(roomJoinCode);
     }
+  }
+
+  /**
+   * Handles the room updated event
+   */
+  private handleRoomUpdated(room: Room) {
+    // Send an event to all users in the room
+    room.users.forEach(user => {
+      const { socketId } =
+        this.sessionManager.getSessionById(user.sessionId) || {};
+      if (socketId) {
+        const roomClient = room.getClient(user.sessionId);
+        this.io.to(socketId).emit(RoomEvent.RoomUpdated, roomClient);
+      }
+    });
   }
 }
