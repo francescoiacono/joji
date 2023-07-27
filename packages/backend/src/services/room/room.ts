@@ -1,4 +1,4 @@
-import { RoomUser } from '@/services';
+import { Game, RoomUser } from '@/services';
 import { RoomClient } from '@joji/types';
 import { EventEmitter } from '../event-emitter';
 import { logger } from '@/utils';
@@ -18,6 +18,7 @@ export class Room {
   public joinCode: string;
   public host: RoomUser | null = null;
   public users: Array<RoomUser> = [];
+  public game: Game | null = null;
 
   constructor(options: RoomOptions) {
     this.joinCode = options.joinCode;
@@ -89,6 +90,13 @@ export class Room {
   }
 
   /**
+   * Returns if the user is the host of the room
+   */
+  public isHost(sessionId: RoomUser['sessionId']): boolean {
+    return this.host?.sessionId === sessionId;
+  }
+
+  /**
    * Reassigns the host of the room to another user
    */
   public reassignHost(): void {
@@ -122,7 +130,18 @@ export class Room {
       joinCode: this.joinCode,
       host: this.host?.getClient() ?? null,
       users: this.users.map(u => u.getClient()),
-      isUserInRoom: this.users.some(u => u.sessionId === sessionId)
+      isUserInRoom: this.users.some(u => u.sessionId === sessionId),
+      game: this.game?.getClient() ?? null
     };
+  }
+
+  /**
+   * Set the game
+   */
+  public setGame(game: Game | null): void {
+    this.game = game;
+
+    // Emit the roomUpdated event
+    this.events.emit('roomUpdated', { room: this });
   }
 }

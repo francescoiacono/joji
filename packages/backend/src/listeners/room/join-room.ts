@@ -1,5 +1,4 @@
 import { RoomEvents, RoomUser } from '@/services';
-import { logger } from '@/utils';
 import { RoomClient, RoomEvent, RoomMessage, SocketMessage } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
@@ -14,8 +13,6 @@ type Options = HandlerOptions<Data, Response>;
 export const joinRoomHandler = (options: Options) => {
   const { server, socket, session, data, ack } = options;
   const { roomManager } = server;
-
-  logger.debug('joinRoomHandler', { socketId: socket.id });
 
   // Make sure all the data is present
   if (!data.roomCode || !data.displayName) {

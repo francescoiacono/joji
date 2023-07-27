@@ -1,4 +1,4 @@
-import { containsBadWord, logger, randomString } from '@/utils';
+import { containsBadWord, randomString } from '@/utils';
 import { Session } from '@/services';
 import { Room, RoomEvents } from './room';
 import { EventEmitter } from '../event-emitter';
@@ -31,8 +31,6 @@ export class RoomManager {
    * Returns all rooms
    */
   public getRooms(): Array<Room> {
-    logger.debug('RoomManager.getRooms');
-
     return Array.from(this.rooms.values());
   }
 

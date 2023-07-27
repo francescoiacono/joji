@@ -1,3 +1,4 @@
+import { GameClient, GameOptions } from '../game';
 import { RoomUserClient } from '../room-user';
 
 export interface RoomClient {
@@ -5,4 +6,5 @@ export interface RoomClient {
   host: RoomUserClient | null;
   users: Array<RoomUserClient>;
   isUserInRoom: boolean;
+  game: GameClient | null;
 }

@@ -1,5 +1,4 @@
 import { RoomEvents, RoomUser } from '@/services';
-import { logger } from '@/utils';
 import { RoomClient, RoomEvent } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
@@ -11,13 +10,8 @@ type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
 
 export const createRoomHandler = (options: Options) => {
-  const { server, socket, data, ack } = options;
-  const { sessionManager, roomManager } = server;
-
-  logger.debug('createRoomHandler', { socketId: socket.id });
-
-  // Get the session from the server
-  const session = sessionManager.getSessionBySocket(socket);
+  const { server, socket, session, data, ack } = options;
+  const { roomManager } = server;
 
   // Make sure the display name is valid
   const displayNameError = validateDisplayName(data.displayName);
