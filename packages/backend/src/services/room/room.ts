@@ -20,7 +20,7 @@ export class Room {
    * Adds a user to the room
    */
   public addUser(user: RoomUser): void {
-    if (!this.isUserInRoom(user)) {
+    if (!this.isUserInRoom(user.sessionId)) {
       this.users.push(user);
     } else {
       throw new Error('User is already in the room');
@@ -30,8 +30,15 @@ export class Room {
   /**
    * Checks if a user is already in the room
    */
-  public isUserInRoom(user: RoomUser): boolean {
-    return this.users.some(u => u.sessionId === user.sessionId);
+  public isUserInRoom(user: RoomUser['sessionId']): boolean {
+    return this.users.some(u => u.sessionId === user);
+  }
+
+  /**
+   * Returns the user with the given session id
+   */
+  public getUser(sessionId: RoomUser['sessionId']): RoomUser | null {
+    return this.users.find(u => u.sessionId === sessionId) ?? null;
   }
 
   /**

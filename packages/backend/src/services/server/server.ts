@@ -1,4 +1,9 @@
-import { Room, RoomManager, SessionManager } from '@/services';
+import {
+  Room,
+  RoomManager,
+  RoomManagerEvents,
+  SessionManager
+} from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { RoomEvent, SocketEvent } from '@joji/types';
@@ -77,37 +82,51 @@ export class Server {
    * Creates a new room manager
    */
   private createRoomManager(): RoomManager {
-    return new RoomManager({
-      onUserAddedToRoom: this.handleUserAddedToRoom.bind(this),
-      onUserRemovedFromRoom: this.handleUserRemovedFromRoom.bind(this),
-      onRoomUpdated: this.handleRoomUpdated.bind(this)
-    });
+    const roomManager = new RoomManager();
+    roomManager.events.on('roomUpdated', this.handleRoomUpdated.bind(this));
+    roomManager.events.on(
+      'userAddedToRoom',
+      this.handleUserAddedToRoom.bind(this)
+    );
+    roomManager.events.on(
+      'userRemovedFromRoom',
+      this.handleUserRemovedFromRoom.bind(this)
+    );
+    return roomManager;
   }
 
   /**
    * Handles the user added to room event
    */
-  private handleUserAddedToRoom(sessionId: string, roomJoinCode: string) {
-    const { socketId } = this.sessionManager.getSessionById(sessionId) || {};
-    if (socketId) {
-      this.io.sockets.sockets.get(socketId)?.join(roomJoinCode);
-    }
-  }
+  private handleUserAddedToRoom: RoomManagerEvents['userAddedToRoom'] =
+    data => {
+      const { user, room } = data;
+      const { socketId } =
+        this.sessionManager.getSessionById(user.sessionId) || {};
+      if (socketId) {
+        this.io.sockets.sockets.get(socketId)?.join(room.joinCode);
+      }
+    };
 
   /**
    * Handles the user removed from room event
    */
-  private handleUserRemovedFromRoom(sessionId: string, roomJoinCode: string) {
-    const { socketId } = this.sessionManager.getSessionById(sessionId) || {};
-    if (socketId) {
-      this.io.sockets.sockets.get(socketId)?.leave(roomJoinCode);
-    }
-  }
+  private handleUserRemovedFromRoom: RoomManagerEvents['userRemovedFromRoom'] =
+    data => {
+      const { user, room } = data;
+      const { socketId } =
+        this.sessionManager.getSessionById(user.sessionId) || {};
+      if (socketId) {
+        this.io.sockets.sockets.get(socketId)?.leave(room.joinCode);
+      }
+    };
 
   /**
    * Handles the room updated event
    */
-  private handleRoomUpdated(room: Room) {
+  private handleRoomUpdated: RoomManagerEvents['roomUpdated'] = data => {
+    const { room } = data;
+
     // Send an event to all users in the room
     room.users.forEach(user => {
       const { socketId } =
@@ -117,5 +136,5 @@ export class Server {
         this.io.to(socketId).emit(RoomEvent.RoomUpdated, roomClient);
       }
     });
-  }
+  };
 }

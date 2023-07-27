@@ -51,7 +51,7 @@ export const joinRoomHandler = (options: Options) => {
   });
 
   // Add the user to the room
-  roomManager.addUserToRoom({ user, joinCode: room.joinCode });
+  roomManager.addUserToRoom(user, room.joinCode);
 
   // Acknowledge the request
   ack({

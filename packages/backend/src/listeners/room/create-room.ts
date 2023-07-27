@@ -36,7 +36,7 @@ export const createRoomHandler = (options: Options) => {
     sessionId: session.id,
     displayName: data.displayName!
   });
-  const room = roomManager.createRoom({ host });
+  const room = roomManager.createRoom(host);
 
   // Acknowledge the event with the room
   return ack({
