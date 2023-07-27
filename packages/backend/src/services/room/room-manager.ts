@@ -1,4 +1,4 @@
-import { randomString } from '@/utils';
+import { containsBadWord, randomString } from '@/utils';
 import { RoomUser, Session } from '@/services';
 import { Room } from './room';
 import { EventEmitter } from '../event-emitter';
@@ -144,7 +144,7 @@ export class RoomManager {
     this.roomUsers.delete(sessionId);
 
     // If the room is empty, delete it
-    if (room.users.length === 0) {
+    if (room.users.length === 1) {
       this.deleteRoom(room.joinCode);
       return null;
     }
@@ -179,7 +179,7 @@ export class RoomManager {
     let joinCode;
     do {
       joinCode = `${randomString(3)}-${randomString(3)}`;
-    } while (this.joinCodeExists(joinCode));
+    } while (this.joinCodeExists(joinCode) || containsBadWord(joinCode));
     return joinCode;
   }
 
