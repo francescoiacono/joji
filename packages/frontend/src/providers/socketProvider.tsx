@@ -5,12 +5,10 @@ import { Socket, io } from 'socket.io-client';
 
 interface SocketContextProps {
   socket: Socket | null;
-  setSocket: (socket: Socket) => void;
 }
 
 const SocketContext = createContext<SocketContextProps>({
-  socket: null,
-  setSocket: () => {}
+  socket: null
 });
 
 interface SocketProviderProps {
@@ -55,7 +53,7 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
   if (loading && !socket) return <p>Loading...</p>;
 
   return (
-    <SocketContext.Provider value={{ socket, setSocket }}>
+    <SocketContext.Provider value={{ socket }}>
       {children}
     </SocketContext.Provider>
   );
