@@ -1,24 +1,37 @@
 'use client';
-import useRoom from '@/hooks/useRoom';
+
+import JoinRoomForm from './subComponents/joinRoomForm';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { useRoom } from '@/providers';
 
 const Room = () => {
   let { slug } = useParams();
-  const { room, getRoom } = useRoom();
+  const { room, loading, getRoom, joinRoom } = useRoom();
 
   useEffect(() => {
-    if (!room && typeof slug === 'string') {
+    if (typeof slug === 'string') {
       getRoom(slug);
-    } else {
-      console.log('2', room);
     }
-  }, [room]);
+  }, [slug]);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <section>
-      <h1>Room {slug}</h1>
-    </section>
+    <>
+      {room && room?.isUserInRoom ? (
+        <section>
+          <h1>Room {slug}</h1>
+          <ul>
+            {room.users.map((user, i) => (
+              <li key={i}>{user.displayName}</li>
+            ))}
+          </ul>
+        </section>
+      ) : (
+        <JoinRoomForm joinRoom={joinRoom} />
+      )}
+    </>
   );
 };
 

@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
-import { SocketProvider } from '@/providers';
+import { SocketProvider, RoomProvider } from '@/providers';
 
 export const metadata: Metadata = {
   title: 'Joji',
@@ -18,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang='en' className={nunito.className}>
       <body>
-        <SocketProvider>{children}</SocketProvider>
+        <SocketProvider>
+          <RoomProvider>{children}</RoomProvider>
+        </SocketProvider>
       </body>
     </html>
   );

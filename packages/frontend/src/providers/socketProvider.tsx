@@ -1,6 +1,6 @@
 'use client';
-import { SocketEvent } from '@joji/types';
 import { FC, createContext, useContext, useEffect, useState } from 'react';
+import { SocketEvent } from '@joji/types';
 import { Socket, io } from 'socket.io-client';
 
 interface SocketContextProps {
@@ -25,6 +25,10 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
     initialiseSocket();
   }, []);
 
+  /**
+   * Initialise socket connection
+   *
+   */
   const initialiseSocket = () => {
     const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
     const sessionId = localStorage.getItem('sessionId');

@@ -1,12 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useRoom } from '@/providers';
+import { useParams } from 'next/navigation';
 
-const CreateRoomForm = () => {
+interface JoinRoomFormProps {
+  joinRoom: (slug: string, displayName: string) => void;
+}
+
+const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ joinRoom }) => {
   const [displayName, setDisplayName] = useState<string>('');
-
-  const { createRoom } = useRoom();
+  const { slug } = useParams();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDisplayName(e.target.value);
@@ -14,13 +17,15 @@ const CreateRoomForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createRoom(displayName);
+    if (typeof slug === 'string') {
+      joinRoom(slug, displayName);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <section>
-        <h2>Create a room!</h2>
+        <h2>Join room</h2>
       </section>
       <section>
         <label>Display Name</label>
@@ -30,5 +35,4 @@ const CreateRoomForm = () => {
     </form>
   );
 };
-
-export default CreateRoomForm;
+export default JoinRoomForm;
