@@ -2,7 +2,7 @@ import { RoomUserClient } from '../room-user';
 
 export interface RoomClient {
   joinCode: string;
-  host: RoomUserClient;
+  host: RoomUserClient | null;
   users: Array<RoomUserClient>;
   isUserInRoom: boolean;
 }

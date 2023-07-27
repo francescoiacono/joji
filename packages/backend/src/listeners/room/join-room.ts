@@ -22,11 +22,6 @@ export const joinRoomHandler = (options: Options) => {
     return ack({ success: false, error: SocketMessage.MissingData });
   }
 
-  // Make sure the session isn't already in a room
-  if (roomManager.getUserRoom(session.id)) {
-    return ack({ success: false, error: RoomMessage.AlreadyInRoom });
-  }
-
   // Make sure the room exists
   const room = roomManager.getRoom(data.roomCode);
   if (!room) {
@@ -43,6 +38,9 @@ export const joinRoomHandler = (options: Options) => {
   if (displayNameError) {
     return ack({ success: false, error: displayNameError });
   }
+
+  // Remove the user from their current room, if they are in one
+  roomManager.removeUserFromRoom(session.id);
 
   // Create the user
   const user = new RoomUser({

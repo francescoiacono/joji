@@ -52,15 +52,14 @@ export class RoomManager {
   }
 
   /**
-   * Creates a new room, adds the host to it, and returns it
+   * Creates a new room
    */
-  public createRoom(host: RoomUser): Room {
+  public createRoom(): Room {
     const joinCode = this.generateUniqueJoinCode();
-    const room = new Room({ joinCode, host });
+    const room = new Room({ joinCode });
 
     // Add the room to the map
     this.rooms.set(room.joinCode, room);
-    this.addUserToRoom(host, joinCode);
 
     // Emit events
     this.events.emit('roomCreated', { room });
@@ -149,13 +148,13 @@ export class RoomManager {
       this.deleteRoom(room.joinCode);
     } else {
       // Reassign the host if the host left
-      if (room.host.sessionId === sessionId) {
+      if (!room.host || room.host.sessionId === sessionId) {
         room.setHost(room.users[0]);
       }
     }
 
     // Emit events
-    this.events.emit('userRemovedFromRoom', { user: room.host, room });
+    this.events.emit('userRemovedFromRoom', { user, room });
     this.events.emit('roomUpdated', { room });
 
     // Return the room

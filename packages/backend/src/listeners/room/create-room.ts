@@ -1,6 +1,6 @@
 import { RoomUser } from '@/services';
 import { logger } from '@/utils';
-import { RoomClient, RoomMessage } from '@joji/types';
+import { RoomClient } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
@@ -19,24 +19,25 @@ export const createRoomHandler = (options: Options) => {
   // Get the session from the server
   const session = sessionManager.getSessionBySocket(socket);
 
-  // Make sure the session isn't already in a room
-  if (roomManager.getUserRoom(session.id)) {
-    return ack({ success: false, error: RoomMessage.AlreadyInRoom });
-  }
-
   // Make sure the display name is valid
   const displayNameError = validateDisplayName(data.displayName);
   if (displayNameError) {
     return ack({ success: false, error: displayNameError });
   }
 
-  // Create a room with the session
-  // This will also add the session to the room
+  // Remove the user from their current room, if they are in one
+  roomManager.removeUserFromRoom(session.id);
+
+  // Create a room
+  const room = roomManager.createRoom();
+
+  // Add the user to the room
   const host = new RoomUser({
     sessionId: session.id,
     displayName: data.displayName!
   });
-  const room = roomManager.createRoom(host);
+  room.addUser(host);
+  room.setHost(host);
 
   // Acknowledge the event with the room
   return ack({
