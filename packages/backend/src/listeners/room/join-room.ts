@@ -54,7 +54,9 @@ export const joinRoomHandler = (options: Options) => {
   roomManager.addUserToRoom({ user, joinCode: room.joinCode });
 
   // Send an update to the room
-  server.io.to(room.joinCode).emit(RoomEvent.RoomUpdated, room);
+  server.io
+    .to(room.joinCode)
+    .emit(RoomEvent.RoomUpdated, room.getClient(session.id));
 
   // Acknowledge the request
   ack({
