@@ -36,15 +36,17 @@ export class Server {
       const session = this.sessionManager.getSessionBySocket(socket);
       socket.emit(SocketEvent.Session, session);
 
+      // Log the connection event
       logger.debug('🔌 User connected', { sessionId: session.id });
 
       // Listen for events
       listeners(this, socket);
 
       // Handle the disconnect event
-      // socket.on('disconnect', () => {
-      //   this.sessionManager.deleteSession(socket);
-      // });
+      socket.on('disconnect', () => {
+        // Start the disconnect timeout
+        this.sessionManager.setDisconnectTimeout(socket);
+      });
     });
 
     // Listen for server errors
