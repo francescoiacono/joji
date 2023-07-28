@@ -15,8 +15,8 @@ export class Server {
 
   constructor() {
     this.io = this.createIOServer();
-    this.sessionManager = this.createSessionManager();
-    this.roomManager = this.createRoomManager();
+    this.sessionManager = new SessionManager();
+    this.roomManager = new RoomManager();
   }
 
   /**
@@ -64,42 +64,5 @@ export class Server {
         methods: ['GET']
       }
     });
-  }
-
-  /**
-   * Creates a new session manager
-   */
-  private createSessionManager(): SessionManager {
-    return new SessionManager();
-  }
-
-  /**
-   * Creates a new room manager
-   */
-  private createRoomManager(): RoomManager {
-    return new RoomManager({
-      onUserAddedToRoom: this.handleUserAddedToRoom.bind(this),
-      onUserRemovedFromRoom: this.handleUserRemovedFromRoom.bind(this)
-    });
-  }
-
-  /**
-   * Handles the user added to room event
-   */
-  private handleUserAddedToRoom(sessionId: string, roomJoinCode: string) {
-    const { socketId } = this.sessionManager.getSessionById(sessionId) || {};
-    if (socketId) {
-      this.io.sockets.sockets.get(socketId)?.join(roomJoinCode);
-    }
-  }
-
-  /**
-   * Handles the user removed from room event
-   */
-  private handleUserRemovedFromRoom(sessionId: string, roomJoinCode: string) {
-    const { socketId } = this.sessionManager.getSessionById(sessionId) || {};
-    if (socketId) {
-      this.io.sockets.sockets.get(socketId)?.leave(roomJoinCode);
-    }
   }
 }

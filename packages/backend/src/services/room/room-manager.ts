@@ -1,31 +1,23 @@
-import { randomString } from '@/utils';
-import { RoomUser, Session } from '@/services';
-import { Room } from './room';
+import { containsBadWord, randomString } from '@/utils';
+import { Session } from '@/services';
+import { Room, RoomEvents } from './room';
+import { EventEmitter } from '../event-emitter';
 
-interface RoomManagerOptions {
-  onUserAddedToRoom?: (sessionId: string, roomCode: string) => void;
-  onUserRemovedFromRoom?: (sessionId: string, roomCode: string) => void;
-}
-
-interface CreateRoomOptions {
-  host: RoomUser;
-}
-interface AddUserToRoomOptions {
-  user: RoomUser;
-  joinCode: Room['joinCode'];
-}
+export type RoomManagerEvents = {
+  roomCreated: (data: { room: Room }) => void;
+  roomDeleted: (data: { room: Room }) => void;
+  roomUpdated: RoomEvents['roomUpdated'];
+};
 
 export class RoomManager {
+  public events: EventEmitter<RoomManagerEvents>;
   private rooms: Map<Room['joinCode'], Room>;
   private roomUsers: Map<Session['id'], Room['joinCode']>;
-  private onUserAddedToRoom?: (sessionId: string, roomCode: string) => void;
-  private onUserRemovedFromRoom?: (sessionId: string, roomCode: string) => void;
 
-  constructor(options?: RoomManagerOptions) {
+  constructor() {
+    this.events = new EventEmitter<RoomManagerEvents>();
     this.rooms = new Map();
     this.roomUsers = new Map();
-    this.onUserAddedToRoom = options?.onUserAddedToRoom;
-    this.onUserRemovedFromRoom = options?.onUserRemovedFromRoom;
   }
 
   /**
@@ -46,25 +38,37 @@ export class RoomManager {
    * Returns the room that the user with the given session is in
    */
   public getUserRoom(sessionId: Session['id']): Room | null {
+    // Get the join code of the room the user is in
     const joinCode = this.roomUsers.get(sessionId);
-    if (joinCode) {
-      return this.getRoom(joinCode) ?? null;
+
+    // If the user is not in a room, return null
+    if (!joinCode) {
+      return null;
     }
-    return null;
+
+    // Return the room
+    return this.getRoom(joinCode) ?? null;
   }
 
   /**
-   * Creates a new room, adds the host to it, and returns it
+   * Creates a new room
    */
-  public createRoom(options: CreateRoomOptions): Room {
-    const { host } = options;
-
+  public createRoom(): Room {
     const joinCode = this.generateUniqueJoinCode();
-    const room = new Room({ joinCode, host });
+    const room = new Room({ joinCode });
 
+    // Add the room to the map
     this.rooms.set(room.joinCode, room);
-    this.addUserToRoom({ user: host, joinCode: room.joinCode });
 
+    // Emit events
+    this.events.emit('roomCreated', { room });
+
+    // Subscribe to events
+    room.events.on('userRemoved', this.handleUserRemoved);
+    room.events.on('userAdded', this.handleUserAdded);
+    room.events.on('roomUpdated', this.handleRoomUpdated);
+
+    // Return the room
     return room;
   }
 
@@ -73,64 +77,27 @@ export class RoomManager {
    */
   public deleteRoom(joinCode: Room['joinCode']): void {
     const room = this.getRoom(joinCode);
-    if (room) {
-      // Remove all users from the room
-      room.users.forEach(user => {
-        this.removeUserFromRoom(user.sessionId);
-      });
 
-      // Delete the room
-      this.rooms.delete(joinCode);
+    // If the room does not exist, return
+    if (!room) {
+      return;
     }
-  }
 
-  /**
-   * Adds a user to the room with the given join code
-   */
-  public addUserToRoom(options: AddUserToRoomOptions): Room | null {
-    const { user, joinCode } = options;
-    const room = this.getRoom(joinCode);
-    if (room) {
-      room.addUser(user);
-      this.roomUsers.set(user.sessionId, room.joinCode);
+    // Remove all users from the room
+    room.users.forEach(user => {
+      room.removeUser(user.sessionId);
+    });
 
-      // Call the onUserAddedToRoom callback
-      if (this.onUserAddedToRoom) {
-        this.onUserAddedToRoom(user.sessionId, room.joinCode);
-      }
-    }
-    return room;
-  }
+    // Unsubscribe from events
+    room.events.off('userRemoved', this.handleUserRemoved);
+    room.events.off('userAdded', this.handleUserAdded);
+    room.events.off('roomUpdated', this.handleRoomUpdated);
 
-  /**
-   * Removes a user from the room they are in
-   */
-  public removeUserFromRoom(sessionId: Session['id']): Room | null {
-    const room = this.getUserRoom(sessionId);
-    console.log(room);
-    if (room) {
-      room.removeUser(sessionId);
-      this.roomUsers.delete(sessionId);
+    // Delete the room
+    this.rooms.delete(joinCode);
 
-      // If the user was the host, re-assign the host
-      if (room.host.sessionId === sessionId) {
-        const newHost = room.users[0];
-        if (newHost) {
-          room.setHost(newHost);
-        }
-      }
-
-      // If the room is empty after re-assigning the host, delete it
-      if (room.users.length === 0) {
-        this.deleteRoom(room.joinCode);
-      }
-
-      // Call the onUserRemovedFromRoom callback
-      if (this.onUserRemovedFromRoom) {
-        this.onUserRemovedFromRoom(sessionId, room.joinCode);
-      }
-    }
-    return room;
+    // Emit events
+    this.events.emit('roomDeleted', { room });
   }
 
   /**
@@ -140,7 +107,7 @@ export class RoomManager {
     let joinCode;
     do {
       joinCode = `${randomString(3)}-${randomString(3)}`;
-    } while (this.joinCodeExists(joinCode));
+    } while (this.joinCodeExists(joinCode) || containsBadWord(joinCode));
     return joinCode;
   }
 
@@ -150,4 +117,33 @@ export class RoomManager {
   private joinCodeExists(joinCode: string): boolean {
     return this.rooms.has(joinCode);
   }
+
+  /**
+   * Handle a user being added to a room
+   */
+  private handleUserAdded: RoomEvents['userAdded'] = ({ room, user }) => {
+    // Add the user to the roomUsers map
+    this.roomUsers.set(user.sessionId, room.joinCode);
+  };
+
+  /**
+   * Handle a user being removed from a room
+   */
+  private handleUserRemoved: RoomEvents['userRemoved'] = ({ room, user }) => {
+    // Remove the user from the roomUsers map
+    this.roomUsers.delete(user.sessionId);
+
+    // If the room is empty, delete it
+    if (room.users.length === 0) {
+      this.deleteRoom(room.joinCode);
+    }
+  };
+
+  /**
+   * Handle a room being updated
+   */
+  private handleRoomUpdated: RoomEvents['roomUpdated'] = data => {
+    // Emit events
+    this.events.emit('roomUpdated', data);
+  };
 }

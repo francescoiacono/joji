@@ -4,5 +4,6 @@ export declare enum RoomEvent {
     CreateRoom = "CREATE_ROOM",
     JoinRoom = "JOIN_ROOM",
     LeaveRoom = "LEAVE_ROOM",
+    SetGame = "SET_GAME",
     RoomUpdated = "ROOM_UPDATED"
 }

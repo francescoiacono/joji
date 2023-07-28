@@ -1,5 +1,4 @@
-import { RoomUser } from '@/services';
-import { logger } from '@/utils';
+import { RoomEvents, RoomUser } from '@/services';
 import { RoomClient, RoomEvent, RoomMessage, SocketMessage } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
@@ -15,22 +14,20 @@ export const joinRoomHandler = (options: Options) => {
   const { server, socket, session, data, ack } = options;
   const { roomManager } = server;
 
-  logger.debug('joinRoomHandler', { socketId: socket.id });
-
   // Make sure all the data is present
   if (!data.roomCode || !data.displayName) {
     return ack({ success: false, error: SocketMessage.MissingData });
-  }
-
-  // Make sure the session isn't already in a room
-  if (roomManager.getUserRoom(session.id)) {
-    return ack({ success: false, error: RoomMessage.AlreadyInRoom });
   }
 
   // Make sure the room exists
   const room = roomManager.getRoom(data.roomCode);
   if (!room) {
     return ack({ success: false, error: RoomMessage.RoomNotFound });
+  }
+
+  // Is the user already in the room?
+  if (room.getUser(session.id)) {
+    return ack({ success: false, error: RoomMessage.AlreadyInRoom });
   }
 
   // Make sure the display name is not taken
@@ -44,6 +41,9 @@ export const joinRoomHandler = (options: Options) => {
     return ack({ success: false, error: displayNameError });
   }
 
+  // Remove the user from their current room, if they are in one
+  roomManager.getUserRoom(session.id)?.removeUser(session.id);
+
   // Create the user
   const user = new RoomUser({
     sessionId: session.id,
@@ -51,12 +51,20 @@ export const joinRoomHandler = (options: Options) => {
   });
 
   // Add the user to the room
-  roomManager.addUserToRoom({ user, joinCode: room.joinCode });
+  room.addUser(user);
 
-  // Send an update to the room
-  server.io
-    .to(room.joinCode)
-    .emit(RoomEvent.RoomUpdated, room.getClient(session.id));
+  // Subscribe to room events
+  const onRoomUpdated = () => {
+    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.id));
+  };
+  const onUserRemoved: RoomEvents['userRemoved'] = data => {
+    if (data.user.sessionId === session.id) {
+      room.events.off('roomUpdated', onRoomUpdated);
+      room.events.off('userRemoved', onUserRemoved);
+    }
+  };
+  room.events.on('roomUpdated', onRoomUpdated);
+  room.events.on('userRemoved', onUserRemoved);
 
   // Acknowledge the request
   ack({
