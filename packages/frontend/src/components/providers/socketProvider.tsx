@@ -33,6 +33,7 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
     if (sessionId) {
       socketInstance.auth = { sessionId };
     }
+
     socketInstance.connect();
 
     socketInstance.on(SocketEvent.Session, session => {

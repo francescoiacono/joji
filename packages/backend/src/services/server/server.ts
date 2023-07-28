@@ -42,9 +42,9 @@ export class Server {
       listeners(this, socket);
 
       // Handle the disconnect event
-      socket.on('disconnect', () => {
-        this.sessionManager.deleteSession(socket);
-      });
+      // socket.on('disconnect', () => {
+      //   this.sessionManager.deleteSession(socket);
+      // });
     });
 
     // Listen for server errors
