@@ -29,15 +29,15 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
       return;
     }
 
-    const socketOptions = sessionId ? { auth: { sessionId } } : {};
-
-    const socketInstance = io(serverUrl, socketOptions);
-
-    if (!sessionId) {
-      socketInstance.on(SocketEvent.Session, session => {
-        localStorage.setItem('sessionId', session.id);
-      });
+    const socketInstance = io(serverUrl, { autoConnect: false });
+    if (sessionId) {
+      socketInstance.auth = { sessionId };
     }
+    socketInstance.connect();
+
+    socketInstance.on(SocketEvent.Session, session => {
+      localStorage.setItem('sessionId', session.id);
+    });
 
     setSocket(socketInstance);
     setLoading(false);
