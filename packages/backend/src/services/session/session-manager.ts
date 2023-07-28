@@ -5,12 +5,14 @@ import { SessionConfig } from '@joji/config';
 import { EventEmitter } from '../event-emitter';
 
 export type SessionManagerEvents = {
+  sessionIdle: (data: { session: Session }) => void;
+  sessionActive: (data: { session: Session }) => void;
   sessionCreated: (data: { session: Session }) => void;
   sessionDeleted: (data: { session: Session }) => void;
 };
 
 export class SessionManager {
-  private events: EventEmitter<SessionManagerEvents>;
+  public events: EventEmitter<SessionManagerEvents>;
   private sessions: Map<Session['id'], Session>;
   private disconnectTimeouts: Map<Session['id'], NodeJS.Timeout> = new Map();
 
@@ -28,8 +30,8 @@ export class SessionManager {
 
     if (existingSessionId) {
       const existingSession = this.sessions.get(existingSessionId);
+
       if (existingSession) {
-        this.clearDisconnectTimeout(socket);
         return existingSession;
       }
     }
@@ -48,12 +50,37 @@ export class SessionManager {
    * Sets a timeout to delete the session if the client does not reconnect
    * within the given timeout
    */
-  public setDisconnectTimeout(socket: Socket): void {
+  public setDisconnectTimeout(session: Session): void {
+    // Create a timeout to delete the session
     const timeout = setTimeout(() => {
-      this.deleteSession(socket);
-      this.clearDisconnectTimeout(socket);
+      this.deleteSession(session);
+      this.clearDisconnectTimeout(session);
     }, SessionConfig.idleTimeout);
-    this.disconnectTimeouts.set(socket.id, timeout);
+
+    // Store the timeout
+    this.disconnectTimeouts.set(session.id, timeout);
+
+    // Emit the `sessionIdle` event
+    this.events.emit('sessionIdle', { session });
+  }
+
+  /**
+   * Clears a disconnect timeout
+   */
+  public clearDisconnectTimeout(session: Session): void {
+    const timeout = this.disconnectTimeouts.get(session.id);
+
+    // If there is no timeout, return
+    if (!timeout) {
+      return;
+    }
+
+    // Clear the timeout and delete it from the map
+    clearTimeout(timeout);
+    this.disconnectTimeouts.delete(session.id);
+
+    // Emit the `sessionActive` event
+    this.events.emit('sessionActive', { session });
   }
 
   /**
@@ -97,9 +124,7 @@ export class SessionManager {
   /**
    * Deletes the session for the given socket
    */
-  private deleteSession(socket: Socket): void {
-    const session = this.getSessionBySocket(socket);
-
+  private deleteSession(session: Session): void {
     // If there is no session id, return
     if (!session) {
       return;
@@ -110,21 +135,5 @@ export class SessionManager {
 
     // Emit the `sessionDeleted` event
     this.events.emit('sessionDeleted', { session });
-  }
-
-  /**
-   * Clears a disconnect timeout
-   */
-  private clearDisconnectTimeout(socket: Socket): void {
-    const timeout = this.disconnectTimeouts.get(socket.id);
-
-    // If there is no timeout, return
-    if (!timeout) {
-      return;
-    }
-
-    // Clear the timeout and delete it from the map
-    clearTimeout(timeout);
-    this.disconnectTimeouts.delete(socket.id);
   }
 }
