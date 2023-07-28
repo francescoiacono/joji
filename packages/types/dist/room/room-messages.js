@@ -14,4 +14,4 @@ var RoomMessage;
     RoomMessage["NoGame"] = "NO_GAME";
     RoomMessage["NotHost"] = "NOT_HOST";
     RoomMessage["InvalidGameOptions"] = "INVALID_GAME_OPTIONS";
-})(RoomMessage = exports.RoomMessage || (exports.RoomMessage = {}));
+})(RoomMessage || (exports.RoomMessage = RoomMessage = {}));

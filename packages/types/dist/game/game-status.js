@@ -6,4 +6,4 @@ var GameStatus;
     GameStatus["Waiting"] = "waiting";
     GameStatus["InProgress"] = "in-progress";
     GameStatus["Ended"] = "ended";
-})(GameStatus = exports.GameStatus || (exports.GameStatus = {}));
+})(GameStatus || (exports.GameStatus = GameStatus = {}));

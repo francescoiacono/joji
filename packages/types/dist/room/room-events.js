@@ -13,4 +13,4 @@ var RoomEvent;
     RoomEvent["SetGameOptions"] = "SET_GAME_OPTIONS";
     // Server -> Client
     RoomEvent["RoomUpdated"] = "ROOM_UPDATED";
-})(RoomEvent = exports.RoomEvent || (exports.RoomEvent = {}));
+})(RoomEvent || (exports.RoomEvent = RoomEvent = {}));

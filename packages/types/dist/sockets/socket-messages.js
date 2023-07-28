@@ -5,4 +5,4 @@ var SocketMessage;
 (function (SocketMessage) {
     SocketMessage["MissingData"] = "MISSING_DATA";
     SocketMessage["MethodNotAllowed"] = "METHOD_NOT_ALLOWED";
-})(SocketMessage = exports.SocketMessage || (exports.SocketMessage = {}));
+})(SocketMessage || (exports.SocketMessage = SocketMessage = {}));
