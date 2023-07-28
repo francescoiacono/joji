@@ -1,7 +1,10 @@
 'use client';
 
+import Form from '@/components/ui/forms/form/form';
+import FormTitle from '@/components/ui/forms/formTitle/formTitle';
+import FormInput from '@/components/ui/forms/formInput/formInput';
 import { useState } from 'react';
-import { useRoom } from '@/providers';
+import { useRoom } from '@/components/providers';
 
 const CreateRoomForm = () => {
   const [displayName, setDisplayName] = useState<string>('');
@@ -18,16 +21,15 @@ const CreateRoomForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <section>
-        <h2>Create a room!</h2>
-      </section>
-      <section>
-        <label>Display Name</label>
-        <input type='text' placeholder='Your name!' onChange={handleChange} />
-      </section>
-      <button>Submit</button>
-    </form>
+    <Form onSubmit={handleSubmit} buttonText='Create'>
+      <FormTitle>Create Room</FormTitle>
+      <FormInput
+        type='text'
+        placeholder='Your username!'
+        onChange={handleChange}
+        labelText='Display Name'
+      />
+    </Form>
   );
 };
 

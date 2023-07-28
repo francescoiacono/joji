@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
-import { SocketProvider, RoomProvider } from '@/providers';
+import { SocketProvider, RoomProvider } from '@/components/providers';
 
 export const metadata: Metadata = {
   title: 'Joji',

@@ -56,6 +56,13 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
     });
   };
 
+  /**
+   * Handles the response from the socket
+   * @param response is the response from the socket
+   * @param callback is the callback function to be called if the response is successful
+   *
+   */
+
   const handleSocketResponse = (
     response: SocketResponse<RoomClient>,
     callback: (room: RoomClient) => void
@@ -73,7 +80,9 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   /**
    * Creates a new room with host
    * @param displayName is the host name
+   *
    */
+
   const createRoom = useCallback(
     (displayName: string) => {
       if (!socket) return console.error('Socket not initialized');
@@ -96,7 +105,9 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   /**
    * Gets a room by join code
    * @param joinCode
+   *
    */
+
   const getRoom = useCallback(
     (joinCode: string) => {
       if (!socket) return console.error('Socket not initialized');

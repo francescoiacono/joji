@@ -1,5 +1,8 @@
 'use client';
 
+import Form from '@/components/ui/forms/form/form';
+import FormTitle from '@/components/ui/forms/formTitle/formTitle';
+import FormInput from '@/components/ui/forms/formInput/formInput';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 
@@ -23,16 +26,15 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ joinRoom }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <section>
-        <h2>Join room</h2>
-      </section>
-      <section>
-        <label>Display Name</label>
-        <input type='text' placeholder='Your name!' onChange={handleChange} />
-      </section>
-      <button>Submit</button>
-    </form>
+    <Form onSubmit={handleSubmit} buttonText='Join'>
+      <FormTitle>Join Room</FormTitle>
+      <FormInput
+        onChange={handleChange}
+        labelText='Display Name'
+        type='text'
+        placeholder='Your name!'
+      ></FormInput>
+    </Form>
   );
 };
 export default JoinRoomForm;

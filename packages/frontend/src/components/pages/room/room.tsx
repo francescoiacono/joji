@@ -1,9 +1,9 @@
 'use client';
 
 import JoinRoomForm from './subComponents/joinRoomForm';
+import { useRoom } from '@/components/providers';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { useRoom } from '@/providers';
 
 const Room = () => {
   let { slug } = useParams();
