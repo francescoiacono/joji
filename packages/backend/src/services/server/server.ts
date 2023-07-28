@@ -32,11 +32,11 @@ export class Server {
 
     // Listen for new connections
     this.io.on('connection', socket => {
-      logger.debug('A user connected', { socketId: socket.id });
-
       // Get the session and send it to the client
       const session = this.sessionManager.getSessionBySocket(socket);
       socket.emit(SocketEvent.Session, session);
+
+      logger.debug('🔌 User connected', { sessionId: session.id });
 
       // Listen for events
       listeners(this, socket);
@@ -44,7 +44,6 @@ export class Server {
       // Handle the disconnect event
       socket.on('disconnect', () => {
         this.sessionManager.deleteSession(socket);
-        logger.debug('User disconnected');
       });
     });
 

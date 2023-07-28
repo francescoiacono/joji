@@ -1,6 +1,7 @@
-interface BaseGameOptions {}
+interface BaseGameOptions {
+}
 export interface DeathrollOptions extends BaseGameOptions {
-  startingValue: number;
+    startingValue: number;
 }
 export type GameOptions = DeathrollOptions;
 export {};
