@@ -131,6 +131,7 @@ export class Room {
       host: this.host?.getClient() ?? null,
       users: this.users.map(u => u.getClient()),
       isUserInRoom: this.users.some(u => u.sessionId === sessionId),
+      isUserHost: this.isHost(sessionId ?? ''),
       game: this.game?.getClient() ?? null
     };
   }
