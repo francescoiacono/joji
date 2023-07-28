@@ -6,6 +6,7 @@ export enum RoomEvent {
   JoinRoom = 'JOIN_ROOM',
   LeaveRoom = 'LEAVE_ROOM',
   SetGame = 'SET_GAME',
+  SetGameOptions = 'SET_GAME_OPTIONS',
 
   // Server -> Client
   RoomUpdated = 'ROOM_UPDATED'

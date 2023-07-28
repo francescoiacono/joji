@@ -4,3 +4,4 @@ export * from './get-rooms';
 export * from './join-room';
 export * from './leave-room';
 export * from './set-game';
+export * from './set-game-options';

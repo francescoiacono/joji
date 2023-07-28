@@ -11,5 +11,7 @@ var RoomMessage;
     RoomMessage["RoomNotFound"] = "ROOM_NOT_FOUND";
     RoomMessage["GameNotFound"] = "GAME_NOT_FOUND";
     RoomMessage["GameInProgress"] = "GAME_IN_PROGRESS";
+    RoomMessage["NoGame"] = "NO_GAME";
     RoomMessage["NotHost"] = "NOT_HOST";
+    RoomMessage["InvalidGameOptions"] = "INVALID_GAME_OPTIONS";
 })(RoomMessage = exports.RoomMessage || (exports.RoomMessage = {}));
