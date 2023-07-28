@@ -1,33 +1,10 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { RoomClient, RoomEvent, SocketResponse } from '@joji/types';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useSocket } from './socketProvider';
-
-interface RoomContextProps {
-  room: RoomClient | null;
-  loading: boolean;
-  createRoom: (displayName: string) => void;
-  getRoom: (slug: string) => void;
-  joinRoom: (slug: string, displayName: string) => void;
-  leaveRoom: () => void;
-}
-
-const RoomContext = createContext<RoomContextProps>({
-  room: null,
-  loading: true,
-  getRoom: () => {},
-  createRoom: () => {},
-  joinRoom: () => {},
-  leaveRoom: () => {}
-});
+import { RoomContext } from '../contexts';
 
 interface RoomProviderProps {
   children: React.ReactNode;

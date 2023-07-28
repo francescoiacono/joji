@@ -1,15 +1,8 @@
 'use client';
-import { FC, createContext, useContext, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import { SocketEvent } from '@joji/types';
 import { Socket, io } from 'socket.io-client';
-
-interface SocketContextProps {
-  socket: Socket | null;
-}
-
-const SocketContext = createContext<SocketContextProps>({
-  socket: null
-});
+import { SocketContext } from '../contexts';
 
 interface SocketProviderProps {
   children: React.ReactNode;
