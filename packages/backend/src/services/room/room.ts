@@ -36,6 +36,11 @@ export class Room {
     // Add the user to the room
     this.users.push(user);
 
+    // Add a listener for the user's roomUserUpdated event
+    user.events.on('roomUserUpdated', () => {
+      this.events.emit('roomUpdated', { room: this });
+    });
+
     // Emit the userAdded event
     this.events.emit('userAdded', { room: this, user });
     this.events.emit('roomUpdated', { room: this });

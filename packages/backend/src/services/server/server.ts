@@ -30,21 +30,29 @@ export class Server {
     // Log the server start event
     logger.info(`🚀 Server listening on port ${port}`);
 
+    // Create event listeners
+    this.createEventListeners();
+
     // Listen for new connections
     this.io.on('connection', socket => {
       // Get the session and send it to the client
       const session = this.sessionManager.getSessionBySocket(socket);
       socket.emit(SocketEvent.Session, session);
 
+      // Clear the disconnect timeout
+      this.sessionManager.clearDisconnectTimeout(session);
+
+      // Log the connection event
       logger.debug('🔌 User connected', { sessionId: session.id });
 
       // Listen for events
       listeners(this, socket);
 
       // Handle the disconnect event
-      // socket.on('disconnect', () => {
-      //   this.sessionManager.deleteSession(socket);
-      // });
+      socket.on('disconnect', () => {
+        // Start the disconnect timeout
+        this.sessionManager.setDisconnectTimeout(session);
+      });
     });
 
     // Listen for server errors
@@ -62,6 +70,27 @@ export class Server {
         origin: process.env.CLIENT_URL,
         methods: ['GET']
       }
+    });
+  }
+
+  /**
+   * Creates listeners for cross-server events
+   */
+  private createEventListeners(): void {
+    // Remove the user from the room when their session is deleted
+    this.sessionManager.events.on('sessionDeleted', data => {
+      const room = this.roomManager.getUserRoom(data.session.id);
+      room?.removeUser(data.session.id);
+    });
+
+    // Set the user's online status when their session becomes idle
+    this.sessionManager.events.on('sessionIdle', data => {
+      const room = this.roomManager.getUserRoom(data.session.id);
+      room?.getUser(data.session.id)?.setOnlineStatus(false);
+    });
+    this.sessionManager.events.on('sessionActive', data => {
+      const room = this.roomManager.getUserRoom(data.session.id);
+      room?.getUser(data.session.id)?.setOnlineStatus(true);
     });
   }
 }
