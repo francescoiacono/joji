@@ -6,5 +6,6 @@ export interface RoomClient {
   host: RoomUserClient | null;
   users: Array<RoomUserClient>;
   isUserInRoom: boolean;
+  isUserHost: boolean;
   game: GameClient<GameOptions> | null;
 }
