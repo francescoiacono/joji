@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { RoomClient, RoomEvent, SocketResponse } from '@joji/types';
+import { GameType, RoomClient, RoomEvent, SocketResponse } from '@joji/types';
 import { useRouter } from 'next/navigation';
 import { useSocket } from './socketProvider';
 import { RoomContext } from '../contexts';
@@ -28,8 +28,11 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const listenForRoomUpdates = () => {
     if (!socket) return console.error('Socket not initialized');
 
+    console.log('[UPDATE ROOM]');
+
     socket.on(RoomEvent.RoomUpdated, (updatedRoom: RoomClient) => {
       setRoom(updatedRoom);
+      console.log(updatedRoom);
     });
   };
 
@@ -63,6 +66,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const createRoom = useCallback(
     (displayName: string) => {
       if (!socket) return console.error('Socket not initialized');
+      console.log('[CREATE ROOM]');
       setLoading(true);
 
       socket.emit(
@@ -71,6 +75,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
         (response: SocketResponse<RoomClient>) => {
           handleSocketResponse(response, room => {
             setRoom(room);
+            console.log(room);
             router.push(`/room/${room.joinCode}`);
           });
         }
@@ -88,6 +93,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const getRoom = useCallback(
     (joinCode: string) => {
       if (!socket) return console.error('Socket not initialized');
+      console.log('[GET ROOM]');
       setLoading(true);
 
       socket.emit(
@@ -96,6 +102,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
         (response: SocketResponse<RoomClient>) => {
           handleSocketResponse(response, room => {
             setRoom(room);
+            console.log(room);
           });
         }
       );
@@ -113,6 +120,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const joinRoom = useCallback(
     (roomCode: string, displayName: string) => {
       if (!socket) return console.error('Socket not initialized');
+      console.log('[JOIN ROOM]');
 
       setLoading(true);
 
@@ -122,6 +130,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
         (response: SocketResponse<RoomClient>) => {
           handleSocketResponse(response, room => {
             setRoom(room);
+            console.log(room);
           });
         }
       );
@@ -137,6 +146,8 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const leaveRoom = useCallback(() => {
     if (!socket) return console.error('Socket not initialized');
 
+    console.log('[LEAVE ROOM]');
+
     setLoading(true);
     socket.emit(
       RoomEvent.LeaveRoom,
@@ -144,10 +155,32 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
       (response: SocketResponse<RoomClient>) => {
         handleSocketResponse(response, room => {
           setRoom(room);
+          console.log(room);
         });
       }
     );
   }, [socket]);
+
+  const setRoomGame = useCallback(
+    (game: GameType) => {
+      if (!socket) return console.error('Socket not initialized');
+
+      console.log('[SET ROOM GAME]');
+
+      setLoading(true);
+      socket.emit(
+        RoomEvent.SetGame,
+        { game },
+        (response: SocketResponse<RoomClient>) => {
+          handleSocketResponse(response, room => {
+            setRoom(room);
+            console.log(room);
+          });
+        }
+      );
+    },
+    [socket]
+  );
 
   return (
     <RoomContext.Provider
@@ -157,7 +190,8 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
         getRoom,
         createRoom,
         joinRoom,
-        leaveRoom
+        leaveRoom,
+        setRoomGame
       }}
     >
       {children}

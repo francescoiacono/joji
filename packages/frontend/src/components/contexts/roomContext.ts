@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { RoomClient } from '@joji/types';
+import { GameType, RoomClient } from '@joji/types';
 
 interface RoomContextProps {
   room: RoomClient | null;
@@ -8,6 +8,7 @@ interface RoomContextProps {
   getRoom: (slug: string) => void;
   joinRoom: (slug: string, displayName: string) => void;
   leaveRoom: () => void;
+  setRoomGame: (game: GameType) => void;
 }
 
 export const RoomContext = createContext<RoomContextProps>({
@@ -16,5 +17,6 @@ export const RoomContext = createContext<RoomContextProps>({
   getRoom: () => {},
   createRoom: () => {},
   joinRoom: () => {},
-  leaveRoom: () => {}
+  leaveRoom: () => {},
+  setRoomGame: () => {}
 });
