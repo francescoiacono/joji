@@ -17,24 +17,23 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
 
   const { socket } = useSocket();
 
+  const listenForRoomUpdates = useCallback(
+    (updatedRoom: RoomClient) => {
+      setRoom(updatedRoom);
+    },
+    [room]
+  );
+
   useEffect(() => {
-    listenForRoomUpdates();
+    const listener = (updatedRoom: RoomClient) =>
+      listenForRoomUpdates(updatedRoom);
+
+    socket?.on(RoomEvent.RoomUpdated, listener);
 
     return () => {
       socket?.off(RoomEvent.RoomUpdated);
     };
-  }, [socket]);
-
-  const listenForRoomUpdates = () => {
-    if (!socket) return console.error('Socket not initialized');
-
-    console.log('[UPDATE ROOM]');
-
-    socket.on(RoomEvent.RoomUpdated, (updatedRoom: RoomClient) => {
-      setRoom(updatedRoom);
-      console.log(updatedRoom);
-    });
-  };
+  }, [socket, listenForRoomUpdates]);
 
   /**
    * Handles the response from the socket
@@ -160,6 +159,13 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
       }
     );
   }, [socket]);
+
+  /**
+   * Sets the game of the room
+   * @param game is the game to be set
+   * @param callback is the callback function to be called if the response is successful
+   *
+   */
 
   const setRoomGame = useCallback(
     (game: GameType) => {
