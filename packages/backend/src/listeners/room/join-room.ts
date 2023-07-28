@@ -37,7 +37,7 @@ export const joinRoomHandler = (options: Options) => {
   }
 
   // Is the game already in progress?
-  if (room.game?.getStatus() !== GameStatus.Waiting) {
+  if (room.game && room.game.getStatus() !== GameStatus.Waiting) {
     return ack({ success: false, error: RoomMessage.GameInProgress });
   }
 

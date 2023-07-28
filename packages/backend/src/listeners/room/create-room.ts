@@ -26,14 +26,10 @@ export const createRoomHandler = (options: Options) => {
   const room = roomManager.createRoom();
 
   // Add the user to the room
-  const host = new RoomUser({
-    sessionId: session.id,
-    displayName: data.displayName!
-  });
-  room.addUser(host);
+  room.addUser({ sessionId: session.id, displayName: data.displayName! });
 
-  // Set the host of the room
-  room.setHost(host);
+  // Set the user as the host
+  room.setHost(session.id);
 
   // Subscribe to room events
   const onRoomUpdated = () => {

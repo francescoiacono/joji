@@ -13,11 +13,15 @@ export type RoomEvents = {
 interface RoomOptions {
   joinCode: string;
 }
+interface RoomUserOptions {
+  sessionId: RoomUser['sessionId'];
+  displayName: RoomUser['displayName'];
+}
 
 export class Room {
   public events: EventEmitter<RoomEvents> = new EventEmitter();
+  public host: RoomUser['sessionId'] | null = null;
   public joinCode: string;
-  public host: RoomUser | null = null;
   public users: Array<RoomUser> = [];
   public game: Game | null = null;
 
@@ -28,11 +32,17 @@ export class Room {
   /**
    * Adds a user to the room
    */
-  public addUser(user: RoomUser): void {
+  public addUser(options: RoomUserOptions): RoomUser {
+    const { sessionId, displayName } = options;
+
     // If the user is already in the room, do nothing
-    if (this.getUser(user.sessionId)) {
-      return;
+    const existingUser = this.getUser(sessionId);
+    if (existingUser) {
+      return existingUser;
     }
+
+    // Create the user
+    const user = new RoomUser({ sessionId, displayName });
 
     // Add the user to the room
     this.users.push(user);
@@ -45,6 +55,9 @@ export class Room {
     // Emit the userAdded event
     this.events.emit('userAdded', { room: this, user });
     this.events.emit('roomUpdated', { room: this });
+
+    // Return the user
+    return user;
   }
 
   /**
@@ -62,7 +75,7 @@ export class Room {
     this.users.splice(index, 1);
 
     // If the user being removed is the host, reassign the host
-    if (this.host && this.host.sessionId === sessionId) {
+    if (this.isHost(sessionId) && this.users.length > 0) {
       this.reassignHost();
     }
 
@@ -98,15 +111,15 @@ export class Room {
   /**
    * Sets the host of the room
    */
-  public setHost(user: RoomUser): void {
+  public setHost(sessionId: RoomUser['sessionId']): void {
     // If the user is not in the room, do nothing
-    if (!this.getUser(user.sessionId)) {
+    if (!this.getUser(sessionId)) {
       logger.warn('setHost: user is not in room');
       return;
     }
 
     // Set the host
-    this.host = user;
+    this.host = sessionId;
 
     // Emit the roomUpdated event
     this.events.emit('roomUpdated', { room: this });
@@ -116,7 +129,7 @@ export class Room {
    * Returns if the user is the host of the room
    */
   public isHost(sessionId: RoomUser['sessionId']): boolean {
-    return this.host?.sessionId === sessionId;
+    return this.host === sessionId;
   }
 
   /**
@@ -130,7 +143,7 @@ export class Room {
 
     // Otherwise, set the host to the first user in the room
     else {
-      this.host = this.users[0];
+      this.host = this.users[0].sessionId;
     }
 
     // Emit the roomUpdated event
@@ -151,8 +164,11 @@ export class Room {
   public getClient(sessionId?: RoomUser['sessionId']): RoomClient {
     return {
       joinCode: this.joinCode,
-      host: this.host?.getClient() ?? null,
-      users: this.users.map(u => u.getClient()),
+      users: this.users.map(u =>
+        u.getClient({
+          isHost: this.isHost(u.sessionId)
+        })
+      ),
       isUserInRoom: this.users.some(u => u.sessionId === sessionId),
       isUserHost: this.isHost(sessionId ?? ''),
       game: this.game?.getClient() ?? null

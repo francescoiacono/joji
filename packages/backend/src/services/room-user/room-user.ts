@@ -5,6 +5,10 @@ export type RoomUserEvents = {
   roomUserUpdated: (data: { roomUser: RoomUser }) => void;
 };
 
+interface GetClientOptions {
+  isHost: boolean;
+}
+
 interface RoomUserOptions {
   sessionId: string;
   displayName: string;
@@ -33,10 +37,11 @@ export class RoomUser {
   /**
    * Returns a RoomUserClient
    */
-  public getClient(): RoomUserClient {
+  public getClient(options: GetClientOptions): RoomUserClient {
     return {
       displayName: this.displayName,
-      isOnline: this.isOnline
+      isOnline: this.isOnline,
+      isHost: options.isHost
     };
   }
 }
