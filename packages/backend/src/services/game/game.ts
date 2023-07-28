@@ -1,19 +1,22 @@
+import { ObjectSchema } from 'yup';
 import { GameClient, GameOptions, GameStatus, GameType } from '@joji/types';
 
 export abstract class Game<TOptions extends GameOptions = GameOptions> {
   abstract type: GameType;
-  protected options: TOptions;
+  abstract optionsSchema: ObjectSchema<Partial<TOptions>>;
+  abstract options: TOptions;
   protected status: GameStatus = GameStatus.Waiting;
 
-  constructor(options: TOptions) {
-    this.options = options;
-  }
-
   /**
-   * Updates the game options
+   * Validates the options for the game
    */
-  updateOptions(options: TOptions): void {
-    this.options = options;
+  validateOptions(options: TOptions): boolean {
+    try {
+      this.optionsSchema.validateSync(options);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
@@ -40,6 +43,11 @@ export abstract class Game<TOptions extends GameOptions = GameOptions> {
       options: this.options
     };
   }
+
+  /**
+   * Updates the game options
+   */
+  abstract updateOptions(options: TOptions): void;
 
   abstract start(): void;
   abstract end(): void;

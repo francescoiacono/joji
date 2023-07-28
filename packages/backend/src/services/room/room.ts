@@ -145,4 +145,20 @@ export class Room {
     // Emit the roomUpdated event
     this.events.emit('roomUpdated', { room: this });
   }
+
+  /**
+   * Set the game options
+   */
+  public setGameOptions(options: Game['options']): void {
+    // If there is no game, do nothing
+    if (!this.game) {
+      return;
+    }
+
+    // Update the game options
+    this.game.updateOptions(options);
+
+    // Emit the roomUpdated event
+    this.events.emit('roomUpdated', { room: this });
+  }
 }

@@ -10,6 +10,7 @@ var RoomEvent;
     RoomEvent["JoinRoom"] = "JOIN_ROOM";
     RoomEvent["LeaveRoom"] = "LEAVE_ROOM";
     RoomEvent["SetGame"] = "SET_GAME";
+    RoomEvent["SetGameOptions"] = "SET_GAME_OPTIONS";
     // Server -> Client
     RoomEvent["RoomUpdated"] = "ROOM_UPDATED";
 })(RoomEvent = exports.RoomEvent || (exports.RoomEvent = {}));

@@ -1,22 +1,21 @@
+import * as yup from 'yup';
 import { Game } from '@/services';
 import { DeathrollOptions, GameType } from '@joji/types';
 
 export class Deathroll extends Game<DeathrollOptions> {
-  type: GameType = GameType.Deathroll;
-  private startingValue: number;
-
-  constructor(options?: DeathrollOptions) {
-    super(
-      options || {
-        startingValue: 100
-      }
-    );
-    this.startingValue = options?.startingValue || 100;
-  }
+  type = GameType.Deathroll;
+  options = {
+    startingValue: 100
+  };
+  optionsSchema = yup.object({
+    startingValue: yup.number().min(1)
+  });
 
   updateOptions(options: DeathrollOptions): void {
-    super.updateOptions(options);
-    this.startingValue = options.startingValue || this.startingValue;
+    this.options = {
+      ...this.options,
+      startingValue: options.startingValue || this.options.startingValue
+    };
   }
 
   start() {}

@@ -6,7 +6,8 @@ import {
   getRoomsHandler,
   joinRoomHandler,
   leaveRoomHandler,
-  setGameHandler
+  setGameHandler,
+  setGameOptionsHandler
 } from './room';
 import { Socket } from 'socket.io';
 
@@ -35,4 +36,5 @@ export const listeners = (server: Server, socket: Socket) => {
   socket.on(RoomEvent.LeaveRoom, handler(leaveRoomHandler));
   socket.on(RoomEvent.JoinRoom, handler(joinRoomHandler));
   socket.on(RoomEvent.SetGame, handler(setGameHandler));
+  socket.on(RoomEvent.SetGameOptions, handler(setGameOptionsHandler));
 };
