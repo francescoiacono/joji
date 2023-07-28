@@ -9,5 +9,8 @@ export enum RoomMessage {
   GameInProgress = 'GAME_IN_PROGRESS',
   NoGame = 'NO_GAME',
   NotHost = 'NOT_HOST',
+  UserNotFound = 'USER_NOT_FOUND',
+  CannotKickSelf = 'CANNOT_KICK_SELF',
+  RoomFull = 'ROOM_FULL',
   InvalidGameOptions = 'INVALID_GAME_OPTIONS'
 }

@@ -13,5 +13,8 @@ var RoomMessage;
     RoomMessage["GameInProgress"] = "GAME_IN_PROGRESS";
     RoomMessage["NoGame"] = "NO_GAME";
     RoomMessage["NotHost"] = "NOT_HOST";
+    RoomMessage["UserNotFound"] = "USER_NOT_FOUND";
+    RoomMessage["CannotKickSelf"] = "CANNOT_KICK_SELF";
+    RoomMessage["RoomFull"] = "ROOM_FULL";
     RoomMessage["InvalidGameOptions"] = "INVALID_GAME_OPTIONS";
 })(RoomMessage = exports.RoomMessage || (exports.RoomMessage = {}));

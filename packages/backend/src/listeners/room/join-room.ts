@@ -1,5 +1,11 @@
 import { RoomEvents, RoomUser } from '@/services';
-import { RoomClient, RoomEvent, RoomMessage, SocketMessage } from '@joji/types';
+import {
+  GameStatus,
+  RoomClient,
+  RoomEvent,
+  RoomMessage,
+  SocketMessage
+} from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
 
@@ -28,6 +34,16 @@ export const joinRoomHandler = (options: Options) => {
   // Is the user already in the room?
   if (room.getUser(session.id)) {
     return ack({ success: false, error: RoomMessage.AlreadyInRoom });
+  }
+
+  // Is the game already in progress?
+  if (room.game?.getStatus() !== GameStatus.Waiting) {
+    return ack({ success: false, error: RoomMessage.GameInProgress });
+  }
+
+  // Is the room full?
+  if (room.isFull()) {
+    return ack({ success: false, error: RoomMessage.RoomFull });
   }
 
   // Make sure the display name is not taken

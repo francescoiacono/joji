@@ -2,6 +2,7 @@ import { Game, RoomUser } from '@/services';
 import { RoomClient } from '@joji/types';
 import { EventEmitter } from '../event-emitter';
 import { logger } from '@/utils';
+import { RoomConfig } from '@joji/config';
 
 export type RoomEvents = {
   userAdded: (data: { room: Room; user: RoomUser }) => void;
@@ -75,6 +76,23 @@ export class Room {
    */
   public getUser(sessionId: RoomUser['sessionId']): RoomUser | null {
     return this.users.find(u => u.sessionId === sessionId) ?? null;
+  }
+
+  /**
+   * Returns a user by their display name, case insensitive
+   */
+  public getUserByDisplayName(
+    displayName: RoomUser['displayName']
+  ): RoomUser | null {
+    const lower = displayName.toLowerCase();
+    return this.users.find(u => u.displayName.toLowerCase() === lower) ?? null;
+  }
+
+  /**
+   * Returns whether the room is full
+   */
+  public isFull(): boolean {
+    return this.users.length >= RoomConfig.maxUsers;
   }
 
   /**

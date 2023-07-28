@@ -5,6 +5,7 @@ import {
   getRoomByJoinCodeHandler,
   getRoomsHandler,
   joinRoomHandler,
+  kickUserHandler,
   leaveRoomHandler,
   setGameHandler,
   setGameOptionsHandler
@@ -35,6 +36,7 @@ export const listeners = (server: Server, socket: Socket) => {
   socket.on(RoomEvent.CreateRoom, handler(createRoomHandler));
   socket.on(RoomEvent.LeaveRoom, handler(leaveRoomHandler));
   socket.on(RoomEvent.JoinRoom, handler(joinRoomHandler));
+  socket.on(RoomEvent.KickUser, handler(kickUserHandler));
   socket.on(RoomEvent.SetGame, handler(setGameHandler));
   socket.on(RoomEvent.SetGameOptions, handler(setGameOptionsHandler));
 };

@@ -5,6 +5,7 @@ export enum RoomEvent {
   CreateRoom = 'CREATE_ROOM',
   JoinRoom = 'JOIN_ROOM',
   LeaveRoom = 'LEAVE_ROOM',
+  KickUser = 'KICK_USER',
   SetGame = 'SET_GAME',
   SetGameOptions = 'SET_GAME_OPTIONS',
 
