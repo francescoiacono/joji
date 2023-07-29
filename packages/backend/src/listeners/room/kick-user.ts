@@ -1,6 +1,8 @@
+import * as yup from 'yup';
 import { RoomUser } from '@/services';
 import { HandlerOptions } from '..';
-import { RoomClient, RoomMessage } from '@joji/types';
+import { RoomClient, RoomMessage, SocketMessage } from '@joji/types';
+import { schemaIsValid } from '@/utils';
 
 interface Data {
   displayName: RoomUser['displayName'];
@@ -8,10 +10,19 @@ interface Data {
 type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
 
+const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
+  displayName: yup.string().required().strict()
+});
+
 export const kickUserHandler = (options: Options) => {
   const { server, session, ack, data } = options;
   const { displayName } = data;
   const { roomManager } = server;
+
+  // Validate the data
+  if (!schemaIsValid(schema, data)) {
+    return ack({ success: false, error: SocketMessage.ValidationError });
+  }
 
   // Get the room the user is in
   const room = roomManager.getUserRoom(session.id);

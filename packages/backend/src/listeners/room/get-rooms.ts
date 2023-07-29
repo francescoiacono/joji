@@ -1,11 +1,8 @@
 import { HandlerOptions } from '..';
 import { RoomClient, SocketMessage } from '@joji/types';
 
-interface Data {
-  joinCode: string;
-}
 type Response = RoomClient[] | null;
-type Options = HandlerOptions<Data, Response>;
+type Options = HandlerOptions<null, Response>;
 
 export const getRoomsHandler = (options: Options) => {
   const { server, session, ack } = options;

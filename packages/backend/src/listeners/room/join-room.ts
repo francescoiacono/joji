@@ -1,3 +1,4 @@
+import * as yup from 'yup';
 import { RoomEvents } from '@/services';
 import {
   GameStatus,
@@ -8,22 +9,29 @@ import {
 } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
+import { schemaIsValid } from '@/utils';
 
 interface Data {
-  roomCode?: string;
-  displayName?: string;
-  avatar?: string;
+  roomCode: string;
+  displayName: string;
+  avatar?: string | null;
 }
 type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
+
+const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
+  roomCode: yup.string().required().strict(),
+  displayName: yup.string().required().strict(),
+  avatar: yup.string().nullable().strict()
+});
 
 export const joinRoomHandler = (options: Options) => {
   const { server, socket, session, data, ack } = options;
   const { roomManager } = server;
 
-  // Make sure all the data is present
-  if (!data.roomCode || !data.displayName) {
-    return ack({ success: false, error: SocketMessage.MissingData });
+  // Validate the data
+  if (!schemaIsValid(schema, data)) {
+    return ack({ success: false, error: SocketMessage.ValidationError });
   }
 
   // Make sure the room exists

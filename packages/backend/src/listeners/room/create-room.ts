@@ -1,19 +1,31 @@
+import * as yup from 'yup';
 import { RoomEvents } from '@/services';
-import { RoomClient, RoomEvent } from '@joji/types';
+import { RoomClient, RoomEvent, SocketMessage } from '@joji/types';
 import { validateDisplayName } from '@/validators';
 import { HandlerOptions } from '..';
+import { schemaIsValid } from '@/utils';
 
 interface Data {
-  displayName?: string;
-  avatar?: string;
+  displayName: string;
+  avatar?: string | null;
 }
 type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
+
+const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
+  displayName: yup.string().required().strict(),
+  avatar: yup.string().nullable().strict()
+});
 
 export const createRoomHandler = (options: Options) => {
   const { server, socket, session, data, ack } = options;
   const { displayName, avatar } = data;
   const { roomManager } = server;
+
+  // Validate the data
+  if (!schemaIsValid(schema, data)) {
+    return ack({ success: false, error: SocketMessage.ValidationError });
+  }
 
   // Make sure the display name is valid
   const displayNameError = validateDisplayName(displayName);
