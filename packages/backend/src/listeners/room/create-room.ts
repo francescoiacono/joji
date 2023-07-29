@@ -34,27 +34,28 @@ export const createRoomHandler = (options: Options) => {
   }
 
   // Remove the user from their current room, if they are in one
-  roomManager.getUserRoom(session.id)?.removeUser(session.id);
+  roomManager.getUserRoom(session.user.id)?.removeUser(session.user.id);
 
   // Create a room
   const room = roomManager.createRoom();
 
   // Add the user to the room
   room.addUser({
-    sessionId: session.id,
+    userId: session.user.id,
     displayName: displayName!,
     avatar
   });
 
   // Set the user as the host
-  room.setHost(session.id);
+  room.setHost(session.user.id);
 
   // Subscribe to room events
   const onRoomUpdated = () => {
-    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.id));
+    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.user.id));
   };
   const onUserRemoved: RoomEvents['userRemoved'] = data => {
-    if (data.user.sessionId === session.id) {
+    const { roomUser } = data;
+    if (roomUser.userId === session.user.id) {
       room.events.off('roomUpdated', onRoomUpdated);
       room.events.off('userRemoved', onUserRemoved);
     }
@@ -65,6 +66,6 @@ export const createRoomHandler = (options: Options) => {
   // Acknowledge the event with the room
   return ack({
     success: true,
-    data: room.getClient(session.id)
+    data: room.getClient(session.user.id)
   });
 };

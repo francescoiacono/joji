@@ -35,13 +35,13 @@ export const setGameHandler = (options: Options) => {
   }
 
   // Make sure the room exists
-  const room = roomManager.getUserRoom(session.id);
+  const room = roomManager.getUserRoom(session.user.id);
   if (!room) {
     return ack({ success: false, error: RoomMessage.NotInRoom });
   }
 
   // Make sure the user is the host
-  if (!room.isHost(session.id)) {
+  if (!room.isHost(session.user.id)) {
     return ack({ success: false, error: RoomMessage.NotHost });
   }
 
@@ -63,5 +63,5 @@ export const setGameHandler = (options: Options) => {
   }
 
   // Acknowledge the request
-  return ack({ success: true, data: room.getClient(session.id) });
+  return ack({ success: true, data: room.getClient(session.user.id) });
 };

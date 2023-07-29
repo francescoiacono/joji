@@ -22,6 +22,6 @@ export const getRoomsHandler = (options: Options) => {
   // Acknowledge the event with the room
   return ack({
     success: true,
-    data: rooms.map(room => room.getClient(session.id))
+    data: rooms.map(room => room.getClient(session.user.id))
   });
 };

@@ -41,7 +41,7 @@ export const joinRoomHandler = (options: Options) => {
   }
 
   // Is the user already in the room?
-  if (room.getUser(session.id)) {
+  if (room.getUser(session.user.id)) {
     return ack({ success: false, error: RoomMessage.AlreadyInRoom });
   }
 
@@ -67,21 +67,22 @@ export const joinRoomHandler = (options: Options) => {
   }
 
   // Remove the user from their current room, if they are in one
-  roomManager.getUserRoom(session.id)?.removeUser(session.id);
+  roomManager.getUserRoom(session.user.id)?.removeUser(session.user.id);
 
   // Add the user to the room
   room.addUser({
-    sessionId: session.id,
+    userId: session.user.id,
     displayName: data.displayName,
     avatar: data.avatar
   });
 
   // Subscribe to room events
   const onRoomUpdated = () => {
-    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.id));
+    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.user.id));
   };
   const onUserRemoved: RoomEvents['userRemoved'] = data => {
-    if (data.user.sessionId === session.id) {
+    const { roomUser } = data;
+    if (roomUser.userId === session.user.id) {
       room.events.off('roomUpdated', onRoomUpdated);
       room.events.off('userRemoved', onUserRemoved);
     }
@@ -92,6 +93,6 @@ export const joinRoomHandler = (options: Options) => {
   // Acknowledge the request
   ack({
     success: true,
-    data: room.getClient(session.id)
+    data: room.getClient(session.user.id)
   });
 };

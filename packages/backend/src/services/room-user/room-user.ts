@@ -1,12 +1,13 @@
 import { RoomUserClient } from '@joji/types';
 import { EventEmitter } from '../event-emitter';
+import { User } from '../user';
 
 export type RoomUserEvents = {
   roomUserUpdated: (data: { roomUser: RoomUser }) => void;
 };
 
 export interface RoomUserOptions {
-  sessionId: string;
+  userId: User['id'];
   displayName: string;
   avatar?: string | null;
 }
@@ -17,14 +18,14 @@ interface GetClientOptions {
 
 export class RoomUser {
   public events: EventEmitter<RoomUserEvents>;
-  public sessionId: string;
+  public userId: User['id'];
   public displayName: string;
   public avatar: string | null;
   public isOnline: boolean = true;
 
   constructor(options: RoomUserOptions) {
     this.events = new EventEmitter<RoomUserEvents>();
-    this.sessionId = options.sessionId;
+    this.userId = options.userId;
     this.displayName = options.displayName;
     this.avatar = options.avatar || null;
   }
@@ -45,7 +46,8 @@ export class RoomUser {
       displayName: this.displayName,
       avatar: this.avatar,
       isOnline: this.isOnline,
-      isHost: options.isHost
+      isHost: options.isHost,
+      userId: this.userId
     };
   }
 }

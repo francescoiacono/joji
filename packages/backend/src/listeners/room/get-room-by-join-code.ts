@@ -28,6 +28,6 @@ export const getRoomByJoinCodeHandler = (options: Options) => {
   // Acknowledge the event with the room
   return ack({
     success: true,
-    data: room?.getClient(session.id) ?? null
+    data: room?.getClient(session.user.id) ?? null
   });
 };

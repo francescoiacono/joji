@@ -9,7 +9,7 @@ export const leaveRoomHandler = (options: Options) => {
   const { roomManager } = server;
 
   // Remove the user from the room
-  roomManager.getUserRoom(session.id)?.removeUser(session.id);
+  roomManager.getUserRoom(session.user.id)?.removeUser(session.user.id);
 
   // Acknowledge the event with the room
   return ack({

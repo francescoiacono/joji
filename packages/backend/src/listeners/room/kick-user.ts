@@ -25,7 +25,7 @@ export const kickUserHandler = (options: Options) => {
   }
 
   // Get the room the user is in
-  const room = roomManager.getUserRoom(session.id);
+  const room = roomManager.getUserRoom(session.user.id);
 
   // If the user is not in a room, return an error
   if (!room) {
@@ -33,7 +33,7 @@ export const kickUserHandler = (options: Options) => {
   }
 
   // Make sure the user is the host
-  if (!room.isHost(session.id)) {
+  if (!room.isHost(session.user.id)) {
     return ack({ success: false, error: RoomMessage.NotHost });
   }
 
@@ -46,16 +46,16 @@ export const kickUserHandler = (options: Options) => {
   }
 
   // Make sure the user isn't trying to kick themselves
-  if (user.sessionId === session.id) {
+  if (user.userId === session.user.id) {
     return ack({ success: false, error: RoomMessage.CannotKickSelf });
   }
 
   // Remove the user from the room
-  room.removeUser(user.sessionId);
+  room.removeUser(user.userId);
 
   // Acknowledge the event with the room
   return ack({
     success: true,
-    data: room.getClient(session.id)
+    data: room.getClient(session.user.id)
   });
 };

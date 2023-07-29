@@ -1,7 +1,7 @@
 import { containsBadWord, randomString } from '@/utils';
-import { Session } from '@/services';
 import { Room, RoomEvents } from './room';
 import { EventEmitter } from '../event-emitter';
+import { User } from '../user';
 
 export type RoomManagerEvents = {
   roomCreated: (data: { room: Room }) => void;
@@ -12,7 +12,7 @@ export type RoomManagerEvents = {
 export class RoomManager {
   public events: EventEmitter<RoomManagerEvents>;
   private rooms: Map<Room['joinCode'], Room>;
-  private roomUsers: Map<Session['id'], Room['joinCode']>;
+  private roomUsers: Map<User['id'], Room['joinCode']>;
 
   constructor() {
     this.events = new EventEmitter<RoomManagerEvents>();
@@ -35,11 +35,11 @@ export class RoomManager {
   }
 
   /**
-   * Returns the room that the user with the given session is in
+   * Returns the room that the user with the given ID is in
    */
-  public getUserRoom(sessionId: Session['id']): Room | null {
+  public getUserRoom(userId: User['id']): Room | null {
     // Get the join code of the room the user is in
-    const joinCode = this.roomUsers.get(sessionId);
+    const joinCode = this.roomUsers.get(userId);
 
     // If the user is not in a room, return null
     if (!joinCode) {
@@ -85,7 +85,7 @@ export class RoomManager {
 
     // Remove all users from the room
     room.users.forEach(user => {
-      room.removeUser(user.sessionId);
+      room.removeUser(user.userId);
     });
 
     // Unsubscribe from events
@@ -121,17 +121,21 @@ export class RoomManager {
   /**
    * Handle a user being added to a room
    */
-  private handleUserAdded: RoomEvents['userAdded'] = ({ room, user }) => {
+  private handleUserAdded: RoomEvents['userAdded'] = data => {
+    const { room, roomUser } = data;
+
     // Add the user to the roomUsers map
-    this.roomUsers.set(user.sessionId, room.joinCode);
+    this.roomUsers.set(roomUser.userId, room.joinCode);
   };
 
   /**
    * Handle a user being removed from a room
    */
-  private handleUserRemoved: RoomEvents['userRemoved'] = ({ room, user }) => {
+  private handleUserRemoved: RoomEvents['userRemoved'] = data => {
+    const { room, roomUser } = data;
+
     // Remove the user from the roomUsers map
-    this.roomUsers.delete(user.sessionId);
+    this.roomUsers.delete(roomUser.userId);
 
     // If the room is empty, delete it
     if (room.users.length === 0) {

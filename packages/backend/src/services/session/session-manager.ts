@@ -3,6 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { Session } from './session';
 import { SessionConfig } from '@joji/config';
 import { EventEmitter } from '../event-emitter';
+import { UserManager } from '../user/user-manager';
+
+interface SessionManagerOptions {
+  userManager: UserManager;
+}
 
 export type SessionManagerEvents = {
   sessionIdle: (data: { session: Session }) => void;
@@ -15,10 +20,12 @@ export class SessionManager {
   public events: EventEmitter<SessionManagerEvents>;
   private sessions: Map<Session['id'], Session>;
   private disconnectTimeouts: Map<Session['id'], NodeJS.Timeout> = new Map();
+  private userManager: UserManager;
 
-  constructor() {
+  constructor(options: SessionManagerOptions) {
     this.events = new EventEmitter<SessionManagerEvents>();
     this.sessions = new Map();
+    this.userManager = options.userManager;
   }
 
   /**
@@ -89,7 +96,8 @@ export class SessionManager {
    */
   private createSession(socket: Socket): Session {
     const id = this.generateSessionId(socket);
-    const session = new Session({ id, socketId: socket.id });
+    const user = this.userManager.createGuestUser();
+    const session = new Session({ id, socketId: socket.id, user });
 
     // Assign the session
     this.sessions.set(id, session);
@@ -106,6 +114,11 @@ export class SessionManager {
    * Returns the session ID associated with the given socket.
    */
   private getSocketSessionId(socket: Socket): string | undefined {
+    // If we're in development, allow the client to specify a session ID
+    if (process.env.NODE_ENV === 'development') {
+      return socket.handshake.headers.session as string;
+    }
+
     return socket.handshake.auth.sessionId;
   }
 

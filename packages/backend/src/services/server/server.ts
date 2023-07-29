@@ -3,6 +3,7 @@ import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { SocketEvent } from '@joji/types';
 import { listeners } from '@/listeners';
+import { UserManager } from '../user/user-manager';
 
 interface ServerStartOptions {
   port?: number;
@@ -10,12 +11,14 @@ interface ServerStartOptions {
 
 export class Server {
   public sessionManager: SessionManager;
+  public userManager: UserManager;
   public roomManager: RoomManager;
   public io: IOServer;
 
   constructor() {
     this.io = this.createIOServer();
-    this.sessionManager = new SessionManager();
+    this.userManager = new UserManager();
+    this.sessionManager = new SessionManager({ userManager: this.userManager });
     this.roomManager = new RoomManager();
   }
 
@@ -37,7 +40,7 @@ export class Server {
     this.io.on('connection', socket => {
       // Get the session and send it to the client
       const session = this.sessionManager.getSessionBySocket(socket);
-      socket.emit(SocketEvent.Session, session);
+      socket.emit(SocketEvent.Session, session.getClient());
 
       // Clear the disconnect timeout
       this.sessionManager.clearDisconnectTimeout(session);
@@ -79,18 +82,18 @@ export class Server {
   private createEventListeners(): void {
     // Remove the user from the room when their session is deleted
     this.sessionManager.events.on('sessionDeleted', data => {
-      const room = this.roomManager.getUserRoom(data.session.id);
-      room?.removeUser(data.session.id);
+      const room = this.roomManager.getUserRoom(data.session.user.id);
+      room?.removeUser(data.session.user.id);
     });
 
     // Set the user's online status when their session becomes idle
     this.sessionManager.events.on('sessionIdle', data => {
-      const room = this.roomManager.getUserRoom(data.session.id);
-      room?.getUser(data.session.id)?.setOnlineStatus(false);
+      const room = this.roomManager.getUserRoom(data.session.user.id);
+      room?.getUser(data.session.user.id)?.setOnlineStatus(false);
     });
     this.sessionManager.events.on('sessionActive', data => {
-      const room = this.roomManager.getUserRoom(data.session.id);
-      room?.getUser(data.session.id)?.setOnlineStatus(true);
+      const room = this.roomManager.getUserRoom(data.session.user.id);
+      room?.getUser(data.session.user.id)?.setOnlineStatus(true);
     });
   }
 }
