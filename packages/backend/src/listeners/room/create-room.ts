@@ -31,7 +31,7 @@ export const createRoomHandler = (options: Options) => {
   room.addUser({
     sessionId: session.id,
     displayName: displayName!,
-    avatarFileName: avatar
+    avatar
   });
 
   // Set the user as the host

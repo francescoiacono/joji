@@ -65,7 +65,7 @@ export const joinRoomHandler = (options: Options) => {
   room.addUser({
     sessionId: session.id,
     displayName: data.displayName,
-    avatarFileName: data.avatar
+    avatar: data.avatar
   });
 
   // Subscribe to room events

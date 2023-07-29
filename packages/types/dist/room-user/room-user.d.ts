@@ -1,6 +1,6 @@
 export interface RoomUserClient {
     displayName: string;
-    avatarUrl: string | null;
+    avatar: string | null;
     isHost: boolean;
     isOnline: boolean;
 }
