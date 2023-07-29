@@ -1,4 +1,4 @@
-import { Game, RoomUser } from '@/services';
+import { Game, RoomUser, RoomUserOptions } from '@/services';
 import { RoomClient } from '@joji/types';
 import { EventEmitter } from '../event-emitter';
 import { logger } from '@/utils';
@@ -12,10 +12,6 @@ export type RoomEvents = {
 
 interface RoomOptions {
   joinCode: string;
-}
-interface RoomUserOptions {
-  sessionId: RoomUser['sessionId'];
-  displayName: RoomUser['displayName'];
 }
 
 export class Room {
@@ -33,16 +29,14 @@ export class Room {
    * Adds a user to the room
    */
   public addUser(options: RoomUserOptions): RoomUser {
-    const { sessionId, displayName } = options;
-
     // If the user is already in the room, do nothing
-    const existingUser = this.getUser(sessionId);
+    const existingUser = this.getUser(options.sessionId);
     if (existingUser) {
       return existingUser;
     }
 
     // Create the user
-    const user = new RoomUser({ sessionId, displayName });
+    const user = new RoomUser(options);
 
     // Add the user to the room
     this.users.push(user);

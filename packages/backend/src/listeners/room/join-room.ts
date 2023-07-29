@@ -1,4 +1,4 @@
-import { RoomEvents, RoomUser } from '@/services';
+import { RoomEvents } from '@/services';
 import {
   GameStatus,
   RoomClient,
@@ -12,6 +12,7 @@ import { HandlerOptions } from '..';
 interface Data {
   roomCode?: string;
   displayName?: string;
+  avatar?: string;
 }
 type Response = RoomClient | null;
 type Options = HandlerOptions<Data, Response>;
@@ -60,14 +61,12 @@ export const joinRoomHandler = (options: Options) => {
   // Remove the user from their current room, if they are in one
   roomManager.getUserRoom(session.id)?.removeUser(session.id);
 
-  // Create the user
-  const user = new RoomUser({
-    sessionId: session.id,
-    displayName: data.displayName
-  });
-
   // Add the user to the room
-  room.addUser(user);
+  room.addUser({
+    sessionId: session.id,
+    displayName: data.displayName,
+    avatarFileName: data.avatar
+  });
 
   // Subscribe to room events
   const onRoomUpdated = () => {
