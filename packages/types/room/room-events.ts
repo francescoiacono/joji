@@ -8,6 +8,7 @@ export enum RoomEvent {
   KickUser = 'KICK_USER',
   SetGame = 'SET_GAME',
   SetGameOptions = 'SET_GAME_OPTIONS',
+  StartGame = 'START_GAME',
 
   // Server -> Client
   RoomUpdated = 'ROOM_UPDATED'

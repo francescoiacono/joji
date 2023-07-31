@@ -7,5 +7,6 @@ export declare enum RoomEvent {
     KickUser = "KICK_USER",
     SetGame = "SET_GAME",
     SetGameOptions = "SET_GAME_OPTIONS",
+    StartGame = "START_GAME",
     RoomUpdated = "ROOM_UPDATED"
 }

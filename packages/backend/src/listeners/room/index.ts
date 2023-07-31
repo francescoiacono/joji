@@ -6,3 +6,4 @@ export * from './kick-user';
 export * from './leave-room';
 export * from './set-game';
 export * from './set-game-options';
+export * from './start-game';

@@ -12,6 +12,7 @@ var RoomEvent;
     RoomEvent["KickUser"] = "KICK_USER";
     RoomEvent["SetGame"] = "SET_GAME";
     RoomEvent["SetGameOptions"] = "SET_GAME_OPTIONS";
+    RoomEvent["StartGame"] = "START_GAME";
     // Server -> Client
     RoomEvent["RoomUpdated"] = "ROOM_UPDATED";
 })(RoomEvent = exports.RoomEvent || (exports.RoomEvent = {}));
