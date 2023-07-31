@@ -15,14 +15,49 @@ interface RoomOptions {
 }
 
 export class Room {
-  public events: EventEmitter<RoomEvents> = new EventEmitter();
-  public hostId: RoomUser['userId'] | null = null;
-  public joinCode: string;
-  public users: Array<RoomUser> = [];
-  public game: Game | null = null;
+  private _events: EventEmitter<RoomEvents> = new EventEmitter();
+  private _hostId: RoomUser['userId'] | null = null;
+  private _joinCode: string;
+  private _users: Array<RoomUser> = [];
+  private _game: Game | null = null;
 
   constructor(options: RoomOptions) {
-    this.joinCode = options.joinCode;
+    this._joinCode = options.joinCode;
+  }
+
+  /**
+   * Returns the `RoomEvents` event emitter
+   */
+  public get events(): EventEmitter<RoomEvents> {
+    return this._events;
+  }
+
+  /**
+   * Returns the room's host ID
+   */
+  public get hostId(): RoomUser['userId'] | null {
+    return this._hostId;
+  }
+
+  /**
+   * Returns the room's join code
+   */
+  public get joinCode(): string {
+    return this._joinCode;
+  }
+
+  /**
+   * Returns the room's users
+   */
+  public get users(): Array<RoomUser> {
+    return this._users;
+  }
+
+  /**
+   * Returns the room's game
+   */
+  public get game(): Game | null {
+    return this._game;
   }
 
   /**
@@ -39,16 +74,16 @@ export class Room {
     const roomUser = new RoomUser(options);
 
     // Add the user to the room
-    this.users.push(roomUser);
+    this._users.push(roomUser);
 
     // Add a listener for the user's roomUserUpdated event
     roomUser.events.on('roomUserUpdated', () => {
-      this.events.emit('roomUpdated', { room: this });
+      this._events.emit('roomUpdated', { room: this });
     });
 
     // Emit the userAdded event
-    this.events.emit('userAdded', { room: this, roomUser });
-    this.events.emit('roomUpdated', { room: this });
+    this._events.emit('userAdded', { room: this, roomUser });
+    this._events.emit('roomUpdated', { room: this });
 
     // Return the user
     return roomUser;
@@ -64,25 +99,25 @@ export class Room {
     }
 
     // Remove the user from the room
-    const index = this.users.findIndex(u => u.userId === userId);
-    const roomUser = this.users[index];
-    this.users.splice(index, 1);
+    const index = this._users.findIndex(u => u.userId === userId);
+    const roomUser = this._users[index];
+    this._users.splice(index, 1);
 
     // If the user being removed is the host, reassign the host
-    if (this.isHost(userId) && this.users.length > 0) {
+    if (this.isHost(userId) && this._users.length > 0) {
       this.reassignHost();
     }
 
     // Emit the userRemoved event
-    this.events.emit('userRemoved', { room: this, roomUser });
-    this.events.emit('roomUpdated', { room: this });
+    this._events.emit('userRemoved', { room: this, roomUser });
+    this._events.emit('roomUpdated', { room: this });
   }
 
   /**
    * Returns the user with the given user id
    */
   public getUser(userId: RoomUser['userId']): RoomUser | null {
-    return this.users.find(u => u.userId === userId) ?? null;
+    return this._users.find(u => u.userId === userId) ?? null;
   }
 
   /**
@@ -92,14 +127,14 @@ export class Room {
     displayName: RoomUser['displayName']
   ): RoomUser | null {
     const lower = displayName.toLowerCase();
-    return this.users.find(u => u.displayName.toLowerCase() === lower) ?? null;
+    return this._users.find(u => u.displayName.toLowerCase() === lower) ?? null;
   }
 
   /**
    * Returns whether the room is full
    */
   public isFull(): boolean {
-    return this.users.length >= RoomConfig.maxUsers;
+    return this._users.length >= RoomConfig.maxUsers;
   }
 
   /**
@@ -113,17 +148,17 @@ export class Room {
     }
 
     // Set the host
-    this.hostId = userId;
+    this._hostId = userId;
 
-    // Emit the roomUpdated event
-    this.events.emit('roomUpdated', { room: this });
+    // Emit the roomUpdated event if the room has more than one user
+    this._events.emit('roomUpdated', { room: this });
   }
 
   /**
    * Returns if the user is the host of the room
    */
   public isHost(userId: RoomUser['userId']): boolean {
-    return this.hostId === userId;
+    return this._hostId === userId;
   }
 
   /**
@@ -131,17 +166,17 @@ export class Room {
    */
   public reassignHost(): void {
     // If there are no users left in the room, set the host to null
-    if (this.users.length === 0) {
-      this.hostId = null;
+    if (this._users.length === 0) {
+      this._hostId = null;
     }
 
     // Otherwise, set the host to the first user in the room
     else {
-      this.hostId = this.users[0].userId;
+      this._hostId = this._users[0].userId;
     }
 
     // Emit the roomUpdated event
-    this.events.emit('roomUpdated', { room: this });
+    this._events.emit('roomUpdated', { room: this });
   }
 
   /**
@@ -149,7 +184,7 @@ export class Room {
    */
   public isDisplayNameTaken(displayName: RoomUser['displayName']): boolean {
     const name = displayName.toLowerCase();
-    return this.users.some(u => u.displayName.toLowerCase() === name);
+    return this._users.some(u => u.displayName.toLowerCase() === name);
   }
 
   /**
@@ -157,16 +192,16 @@ export class Room {
    */
   public getClient(userId?: RoomUser['userId']): RoomClient {
     return {
-      joinCode: this.joinCode,
-      host: this.hostId ?? null,
-      users: this.users.map(u =>
+      joinCode: this._joinCode,
+      host: this._hostId ?? null,
+      users: this._users.map(u =>
         u.getClient({
           isHost: this.isHost(u.userId)
         })
       ),
-      isUserInRoom: this.users.some(u => u.userId === userId),
+      isUserInRoom: this._users.some(u => u.userId === userId),
       isUserHost: this.isHost(userId ?? ''),
-      game: this.game?.getClient() ?? null
+      game: this._game?.getClient() ?? null
     };
   }
 
@@ -174,17 +209,17 @@ export class Room {
    * Set the game
    */
   public setGame(game: Game | null): void {
-    this.game = game;
+    this._game = game;
 
     // Emit the roomUpdated event
-    this.events.emit('roomUpdated', { room: this });
+    this._events.emit('roomUpdated', { room: this });
   }
 
   /**
    * Returns the current game
    */
   public getGame(): Game | null {
-    return this.game;
+    return this._game;
   }
 
   /**
@@ -192,22 +227,22 @@ export class Room {
    */
   public setGameOptions(options: Game['options']): void {
     // If there is no game, do nothing
-    if (!this.game) {
+    if (!this._game) {
       return;
     }
 
     // Update the game options
-    this.game.updateOptions(options);
+    this._game.updateOptions(options);
 
     // Emit the roomUpdated event
-    this.events.emit('roomUpdated', { room: this });
+    this._events.emit('roomUpdated', { room: this });
   }
 
   /**
    * Returns if all room users are online
    */
   public areAllUsersOnline(): boolean {
-    return this.users.every(u => u.isOnline);
+    return this._users.every(u => u.isOnline);
   }
 
   /**
@@ -215,15 +250,15 @@ export class Room {
    */
   public startGame(): void {
     // If there is no game, do nothing
-    if (!this.game) {
+    if (!this._game) {
       return;
     }
 
     // Start the game
-    const players = this.users.map(u => u.userId);
-    this.game.start(players);
+    const players = this._users.map(u => u.userId);
+    this._game.start(players);
 
     // Emit the roomUpdated event
-    this.events.emit('roomUpdated', { room: this });
+    this._events.emit('roomUpdated', { room: this });
   }
 }

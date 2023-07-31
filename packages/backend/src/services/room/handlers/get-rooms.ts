@@ -1,12 +1,14 @@
-import { HandlerOptions } from '..';
+import { RoomController } from '../room-controller';
+import { Handler } from '@/utils';
 import { RoomClient, SocketMessage } from '@joji/types';
 
-type Response = RoomClient[] | null;
-type Options = HandlerOptions<null, Response>;
+type Req = null;
+type Res = RoomClient[];
+type Controller = RoomController;
 
-export const getRoomsHandler = (options: Options) => {
-  const { server, session, ack } = options;
-  const { roomService } = server;
+export const getRoomsHandler: Handler<Req, Res, Controller> = options => {
+  const { ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Only allow this event in development
   if (process.env.NODE_ENV !== 'development') {
@@ -16,7 +18,7 @@ export const getRoomsHandler = (options: Options) => {
     });
   }
 
-  // Get all rooms
+  // Get the data
   const rooms = roomService.getRooms();
 
   // Acknowledge the event with the room

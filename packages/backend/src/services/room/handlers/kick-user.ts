@@ -1,23 +1,22 @@
 import * as yup from 'yup';
-import { RoomUser } from '@/services';
-import { HandlerOptions } from '..';
+import { RoomController } from '../room-controller';
+import { Handler, schemaIsValid } from '@/utils';
 import { RoomClient, RoomMessage, SocketMessage } from '@joji/types';
-import { schemaIsValid } from '@/utils';
+import { RoomUser } from '@/services/room-user';
 
-interface Data {
-  displayName: RoomUser['displayName'];
-}
-type Response = RoomClient | null;
-type Options = HandlerOptions<Data, Response>;
+type Req = {
+  userId: RoomUser['userId'];
+};
+type Res = RoomClient;
+type Controller = RoomController;
 
-const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
-  displayName: yup.string().required().strict()
+const schema: yup.ObjectSchema<Partial<Req>> = yup.object({
+  userId: yup.string().required().strict()
 });
 
-export const kickUserHandler = (options: Options) => {
-  const { server, session, ack, data } = options;
-  const { displayName } = data;
-  const { roomService } = server;
+export const kickUserHandler: Handler<Req, Res, Controller> = options => {
+  const { data, ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -38,7 +37,7 @@ export const kickUserHandler = (options: Options) => {
   }
 
   // Find the user to kick
-  const user = room.getUserByDisplayName(displayName);
+  const user = room.getUser(data.userId);
 
   // If the user is not in the room, return an error
   if (!user) {

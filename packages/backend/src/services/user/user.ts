@@ -5,10 +5,17 @@ interface UserOptions {
 }
 
 export class User {
-  public id: string;
+  private _id: string;
 
   constructor(options: UserOptions) {
-    this.id = options.id;
+    this._id = options.id;
+  }
+
+  /**
+   * Returns the user ID
+   */
+  public get id(): string {
+    return this._id;
   }
 
   /**
@@ -16,7 +23,7 @@ export class User {
    */
   public getClient(): UserClient {
     return {
-      id: this.id
+      id: this._id
     };
   }
 }

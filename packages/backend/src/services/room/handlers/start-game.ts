@@ -1,12 +1,14 @@
+import { RoomController } from '../room-controller';
+import { Handler } from '@/utils';
 import { GameState, GameStatus, RoomMessage } from '@joji/types';
-import { HandlerOptions } from '..';
 
-type Response = GameState | null;
-type Options = HandlerOptions<null, Response>;
+type Req = null;
+type Res = GameState;
+type Controller = RoomController;
 
-export const startGameHandler = (options: Options) => {
-  const { server, session, ack } = options;
-  const { roomService } = server;
+export const startGameHandler: Handler<Req, Res, Controller> = options => {
+  const { ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Get the room the user is in
   const room = roomService.getUserRoom(session.user.id);

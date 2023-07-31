@@ -56,6 +56,15 @@ export class SessionService {
   }
 
   /**
+   * Returns all sessions associated with the given user ID
+   */
+  public getSessionsByUserId(userId: Session['user']['id']): Session[] {
+    return Array.from(this.sessions.values()).filter(
+      session => session.user.id === userId
+    );
+  }
+
+  /**
    * Called when a socket disconnects
    */
   public onSocketDisconnect(socket: Socket): void {
@@ -75,7 +84,7 @@ export class SessionService {
     session.removeSocketId(socket.id);
 
     // Start the disconnect timeout if the session is empty
-    if (session.socketIds.size === 0) {
+    if (session.socketIds.length === 0) {
       this.setDisconnectTimeout(session);
     }
   }

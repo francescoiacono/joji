@@ -1,33 +1,31 @@
 import * as yup from 'yup';
-import { RoomEvents } from '@/services';
+import { RoomController } from '../room-controller';
+import { Handler, schemaIsValid } from '@/utils';
 import {
   GameStatus,
   RoomClient,
-  RoomEvent,
   RoomMessage,
   SocketMessage
 } from '@joji/types';
 import { validateDisplayName } from '@/validators';
-import { HandlerOptions } from '..';
-import { schemaIsValid } from '@/utils';
 
-interface Data {
+type Req = {
   roomCode: string;
   displayName: string;
   avatar?: string | null;
-}
-type Response = RoomClient | null;
-type Options = HandlerOptions<Data, Response>;
+};
+type Res = RoomClient;
+type Controller = RoomController;
 
-const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
+const schema: yup.ObjectSchema<Partial<Req>> = yup.object({
   roomCode: yup.string().required().strict(),
   displayName: yup.string().required().strict(),
   avatar: yup.string().nullable().strict()
 });
 
-export const joinRoomHandler = (options: Options) => {
-  const { server, socket, session, data, ack } = options;
-  const { roomService } = server;
+export const joinRoomHandler: Handler<Req, Res, Controller> = options => {
+  const { data, ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -75,20 +73,6 @@ export const joinRoomHandler = (options: Options) => {
     displayName: data.displayName,
     avatar: data.avatar
   });
-
-  // Subscribe to room events
-  const onRoomUpdated = () => {
-    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.user.id));
-  };
-  const onUserRemoved: RoomEvents['userRemoved'] = data => {
-    const { roomUser } = data;
-    if (roomUser.userId === session.user.id) {
-      room.events.off('roomUpdated', onRoomUpdated);
-      room.events.off('userRemoved', onUserRemoved);
-    }
-  };
-  room.events.on('roomUpdated', onRoomUpdated);
-  room.events.on('userRemoved', onUserRemoved);
 
   // Acknowledge the request
   ack({

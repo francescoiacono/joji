@@ -1,26 +1,25 @@
 import * as yup from 'yup';
-import { RoomEvents } from '@/services';
-import { RoomClient, RoomEvent, SocketMessage } from '@joji/types';
+import { RoomController } from '../room-controller';
+import { Handler, schemaIsValid } from '@/utils';
+import { RoomClient, SocketMessage } from '@joji/types';
 import { validateDisplayName } from '@/validators';
-import { HandlerOptions } from '..';
-import { schemaIsValid } from '@/utils';
 
-interface Data {
+type Req = {
   displayName: string;
   avatar?: string | null;
-}
-type Response = RoomClient | null;
-type Options = HandlerOptions<Data, Response>;
+};
+type Res = RoomClient;
+type Controller = RoomController;
 
-const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
+const schema: yup.ObjectSchema<Partial<Req>> = yup.object({
   displayName: yup.string().required().strict(),
   avatar: yup.string().nullable().strict()
 });
 
-export const createRoomHandler = (options: Options) => {
-  const { server, socket, session, data, ack } = options;
+export const createRoomHandler: Handler<Req, Res, Controller> = options => {
+  const { data, ack, controller, session } = options;
   const { displayName, avatar } = data;
-  const { roomService } = server;
+  const { roomService } = controller;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -48,20 +47,6 @@ export const createRoomHandler = (options: Options) => {
 
   // Set the user as the host
   room.setHost(session.user.id);
-
-  // Subscribe to room events
-  const onRoomUpdated = () => {
-    socket.emit(RoomEvent.RoomUpdated, room.getClient(session.user.id));
-  };
-  const onUserRemoved: RoomEvents['userRemoved'] = data => {
-    const { roomUser } = data;
-    if (roomUser.userId === session.user.id) {
-      room.events.off('roomUpdated', onRoomUpdated);
-      room.events.off('userRemoved', onUserRemoved);
-    }
-  };
-  room.events.on('roomUpdated', onRoomUpdated);
-  room.events.on('userRemoved', onUserRemoved);
 
   // Acknowledge the event with the room
   return ack({

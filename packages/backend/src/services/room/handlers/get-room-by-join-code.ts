@@ -1,21 +1,25 @@
 import * as yup from 'yup';
-import { HandlerOptions } from '..';
+import { RoomController } from '../room-controller';
+import { Handler, schemaIsValid } from '@/utils';
 import { RoomClient, SocketMessage } from '@joji/types';
-import { schemaIsValid } from '@/utils';
 
-interface Data {
+type Req = {
   joinCode: string;
-}
-type Response = RoomClient | null;
-type Options = HandlerOptions<Data, Response>;
+};
+type Res = RoomClient | null;
+type Controller = RoomController;
 
-const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
+const schema: yup.ObjectSchema<Partial<Req>> = yup.object({
   joinCode: yup.string().required().strict()
 });
 
-export const getRoomByJoinCodeHandler = (options: Options) => {
-  const { server, session, data, ack } = options;
-  const { roomService } = server;
+export const getRoomByJoinCodeHandler: Handler<
+  Req,
+  Res,
+  Controller
+> = options => {
+  const { data, ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {

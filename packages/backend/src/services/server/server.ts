@@ -1,8 +1,7 @@
-import { RoomService, SessionService } from '@/services';
+import { RoomController, SessionService } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { SocketEvent } from '@joji/types';
-import { listeners } from '@/listeners';
 import { UserService } from '../user/user-manager';
 
 interface ServerStartOptions {
@@ -10,16 +9,16 @@ interface ServerStartOptions {
 }
 
 export class Server {
-  public sessionService: SessionService;
-  public userService: UserService;
-  public roomService: RoomService;
-  public io: IOServer;
+  private sessionService: SessionService;
+  private userService: UserService;
+  private roomController: RoomController;
+  private io: IOServer;
 
   constructor() {
     this.io = this.createIOServer();
     this.userService = new UserService();
     this.sessionService = new SessionService({ userService: this.userService });
-    this.roomService = new RoomService();
+    this.roomController = new RoomController(this.io, this.sessionService);
   }
 
   /**
@@ -33,9 +32,6 @@ export class Server {
     // Log the server start event
     logger.info(`🚀 Server listening on port ${port}`);
 
-    // Create event listeners
-    this.createEventListeners();
-
     // Listen for new connections
     this.io.on('connection', socket => {
       // Get the session and send it to the client
@@ -47,9 +43,6 @@ export class Server {
 
       // Log the connection event
       logger.debug('🔌 User connected', { sessionId: session.id });
-
-      // Listen for events
-      listeners(this, socket);
 
       // Handle the disconnect event
       socket.on('disconnect', () => {
@@ -73,27 +66,6 @@ export class Server {
         origin: process.env.CLIENT_URL,
         methods: ['GET']
       }
-    });
-  }
-
-  /**
-   * Creates listeners for cross-server events
-   */
-  private createEventListeners(): void {
-    // Remove the user from the room when their session is deleted
-    this.sessionService.events.on('sessionDeleted', data => {
-      const room = this.roomService.getUserRoom(data.session.user.id);
-      room?.removeUser(data.session.user.id);
-    });
-
-    // Set the user's online status when their session becomes idle
-    this.sessionService.events.on('sessionIdle', data => {
-      const room = this.roomService.getUserRoom(data.session.user.id);
-      room?.getUser(data.session.user.id)?.setOnlineStatus(false);
-    });
-    this.sessionService.events.on('sessionActive', data => {
-      const room = this.roomService.getUserRoom(data.session.user.id);
-      room?.getUser(data.session.user.id)?.setOnlineStatus(true);
     });
   }
 }

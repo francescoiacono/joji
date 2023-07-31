@@ -1,12 +1,14 @@
-import { HandlerOptions } from '..';
+import { RoomController } from '../room-controller';
+import { Handler } from '@/utils';
 import { GameOptions, GameStatus, RoomClient, RoomMessage } from '@joji/types';
 
-type Response = RoomClient | null;
-type Options = HandlerOptions<GameOptions, Response>;
+type Req = GameOptions;
+type Res = RoomClient;
+type Controller = RoomController;
 
-export const setGameOptionsHandler = (options: Options) => {
-  const { server, session, ack, data } = options;
-  const { roomService } = server;
+export const setGameOptionsHandler: Handler<Req, Res, Controller> = options => {
+  const { data, ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Make sure the room exists
   const room = roomService.getUserRoom(session.user.id);

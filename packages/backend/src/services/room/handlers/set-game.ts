@@ -1,5 +1,6 @@
 import * as yup from 'yup';
-import { HandlerOptions } from '..';
+import { RoomController } from '../room-controller';
+import { Handler, schemaIsValid } from '@/utils';
 import {
   GameStatus,
   GameType,
@@ -8,15 +9,14 @@ import {
   SocketMessage
 } from '@joji/types';
 import { Deathroll } from '@/games';
-import { schemaIsValid } from '@/utils';
 
-interface Data {
+type Req = {
   game: GameType | null;
-}
-type Response = RoomClient | null;
-type Options = HandlerOptions<Data, Response>;
+};
+type Res = RoomClient;
+type Controller = RoomController;
 
-const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
+const schema: yup.ObjectSchema<Partial<Req>> = yup.object({
   game: yup
     .mixed<GameType>()
     .oneOf(Object.values(GameType))
@@ -24,10 +24,9 @@ const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
     .required()
 });
 
-export const setGameHandler = (options: Options) => {
-  const { server, session, ack, data } = options;
-  const { game } = data;
-  const { roomService } = server;
+export const setGameHandler: Handler<Req, Res, Controller> = options => {
+  const { data, ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -51,7 +50,7 @@ export const setGameHandler = (options: Options) => {
   }
 
   // Create the game
-  switch (game) {
+  switch (data.game) {
     case null:
       room.setGame(null);
       break;
