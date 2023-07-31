@@ -17,7 +17,7 @@ const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
 export const kickUserHandler = (options: Options) => {
   const { server, session, ack, data } = options;
   const { displayName } = data;
-  const { roomManager } = server;
+  const { roomService } = server;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -25,7 +25,7 @@ export const kickUserHandler = (options: Options) => {
   }
 
   // Get the room the user is in
-  const room = roomManager.getUserRoom(session.user.id);
+  const room = roomService.getUserRoom(session.user.id);
 
   // If the user is not in a room, return an error
   if (!room) {

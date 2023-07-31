@@ -15,7 +15,7 @@ const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
 
 export const getRoomByJoinCodeHandler = (options: Options) => {
   const { server, session, data, ack } = options;
-  const { roomManager } = server;
+  const { roomService } = server;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -23,7 +23,7 @@ export const getRoomByJoinCodeHandler = (options: Options) => {
   }
 
   // Get the room by the join code
-  const room = roomManager.getRoom(data.joinCode);
+  const room = roomService.getRoom(data.joinCode);
 
   // Acknowledge the event with the room
   return ack({

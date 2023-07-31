@@ -3,29 +3,29 @@ import { v4 as uuidv4 } from 'uuid';
 import { Session } from './session';
 import { SessionConfig } from '@joji/config';
 import { EventEmitter } from '../event-emitter';
-import { UserManager } from '../user/user-manager';
+import { UserService } from '../user/user-manager';
 
-interface SessionManagerOptions {
-  userManager: UserManager;
+interface SessionServiceOptions {
+  userService: UserService;
 }
 
-export type SessionManagerEvents = {
+export type SessionServiceEvents = {
   sessionIdle: (data: { session: Session }) => void;
   sessionActive: (data: { session: Session }) => void;
   sessionCreated: (data: { session: Session }) => void;
   sessionDeleted: (data: { session: Session }) => void;
 };
 
-export class SessionManager {
-  public events: EventEmitter<SessionManagerEvents>;
+export class SessionService {
+  public events: EventEmitter<SessionServiceEvents>;
   private sessions: Map<Session['id'], Session>;
   private disconnectTimeouts: Map<Session['id'], NodeJS.Timeout> = new Map();
-  private userManager: UserManager;
+  private userService: UserService;
 
-  constructor(options: SessionManagerOptions) {
-    this.events = new EventEmitter<SessionManagerEvents>();
+  constructor(options: SessionServiceOptions) {
+    this.events = new EventEmitter<SessionServiceEvents>();
     this.sessions = new Map();
-    this.userManager = options.userManager;
+    this.userService = options.userService;
   }
 
   /**
@@ -123,7 +123,7 @@ export class SessionManager {
    */
   private createSession(socket: Socket): Session {
     const id = this.generateSessionId(socket);
-    const user = this.userManager.createGuestUser();
+    const user = this.userService.createGuestUser();
     const session = new Session({ id, socketIds: new Set([socket.id]), user });
 
     // Assign the session

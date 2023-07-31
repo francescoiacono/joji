@@ -1,25 +1,25 @@
-import { RoomManager, SessionManager } from '@/services';
+import { RoomService, SessionService } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { SocketEvent } from '@joji/types';
 import { listeners } from '@/listeners';
-import { UserManager } from '../user/user-manager';
+import { UserService } from '../user/user-manager';
 
 interface ServerStartOptions {
   port?: number;
 }
 
 export class Server {
-  public sessionManager: SessionManager;
-  public userManager: UserManager;
-  public roomManager: RoomManager;
+  public sessionService: SessionService;
+  public userService: UserService;
+  public roomService: RoomService;
   public io: IOServer;
 
   constructor() {
     this.io = this.createIOServer();
-    this.userManager = new UserManager();
-    this.sessionManager = new SessionManager({ userManager: this.userManager });
-    this.roomManager = new RoomManager();
+    this.userService = new UserService();
+    this.sessionService = new SessionService({ userService: this.userService });
+    this.roomService = new RoomService();
   }
 
   /**
@@ -39,11 +39,11 @@ export class Server {
     // Listen for new connections
     this.io.on('connection', socket => {
       // Get the session and send it to the client
-      const session = this.sessionManager.getSessionBySocket(socket);
+      const session = this.sessionService.getSessionBySocket(socket);
       socket.emit(SocketEvent.Session, session.getClient());
 
       // Clear the disconnect timeout
-      this.sessionManager.clearDisconnectTimeout(session);
+      this.sessionService.clearDisconnectTimeout(session);
 
       // Log the connection event
       logger.debug('🔌 User connected', { sessionId: session.id });
@@ -54,7 +54,7 @@ export class Server {
       // Handle the disconnect event
       socket.on('disconnect', () => {
         // Start the disconnect timeout
-        this.sessionManager.onSocketDisconnect(socket);
+        this.sessionService.onSocketDisconnect(socket);
       });
     });
 
@@ -81,18 +81,18 @@ export class Server {
    */
   private createEventListeners(): void {
     // Remove the user from the room when their session is deleted
-    this.sessionManager.events.on('sessionDeleted', data => {
-      const room = this.roomManager.getUserRoom(data.session.user.id);
+    this.sessionService.events.on('sessionDeleted', data => {
+      const room = this.roomService.getUserRoom(data.session.user.id);
       room?.removeUser(data.session.user.id);
     });
 
     // Set the user's online status when their session becomes idle
-    this.sessionManager.events.on('sessionIdle', data => {
-      const room = this.roomManager.getUserRoom(data.session.user.id);
+    this.sessionService.events.on('sessionIdle', data => {
+      const room = this.roomService.getUserRoom(data.session.user.id);
       room?.getUser(data.session.user.id)?.setOnlineStatus(false);
     });
-    this.sessionManager.events.on('sessionActive', data => {
-      const room = this.roomManager.getUserRoom(data.session.user.id);
+    this.sessionService.events.on('sessionActive', data => {
+      const room = this.roomService.getUserRoom(data.session.user.id);
       room?.getUser(data.session.user.id)?.setOnlineStatus(true);
     });
   }

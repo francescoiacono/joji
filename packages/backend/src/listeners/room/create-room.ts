@@ -20,7 +20,7 @@ const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
 export const createRoomHandler = (options: Options) => {
   const { server, socket, session, data, ack } = options;
   const { displayName, avatar } = data;
-  const { roomManager } = server;
+  const { roomService } = server;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -34,10 +34,10 @@ export const createRoomHandler = (options: Options) => {
   }
 
   // Remove the user from their current room, if they are in one
-  roomManager.getUserRoom(session.user.id)?.removeUser(session.user.id);
+  roomService.getUserRoom(session.user.id)?.removeUser(session.user.id);
 
   // Create a room
-  const room = roomManager.createRoom();
+  const room = roomService.createRoom();
 
   // Add the user to the room
   room.addUser({

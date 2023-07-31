@@ -6,7 +6,7 @@ type Options = HandlerOptions<null, Response>;
 
 export const getRoomsHandler = (options: Options) => {
   const { server, session, ack } = options;
-  const { roomManager } = server;
+  const { roomService } = server;
 
   // Only allow this event in development
   if (process.env.NODE_ENV !== 'development') {
@@ -17,7 +17,7 @@ export const getRoomsHandler = (options: Options) => {
   }
 
   // Get all rooms
-  const rooms = roomManager.getRooms();
+  const rooms = roomService.getRooms();
 
   // Acknowledge the event with the room
   return ack({

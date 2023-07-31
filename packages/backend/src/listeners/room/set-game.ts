@@ -27,7 +27,7 @@ const schema: yup.ObjectSchema<Partial<Data>> = yup.object({
 export const setGameHandler = (options: Options) => {
   const { server, session, ack, data } = options;
   const { game } = data;
-  const { roomManager } = server;
+  const { roomService } = server;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
@@ -35,7 +35,7 @@ export const setGameHandler = (options: Options) => {
   }
 
   // Make sure the room exists
-  const room = roomManager.getUserRoom(session.user.id);
+  const room = roomService.getUserRoom(session.user.id);
   if (!room) {
     return ack({ success: false, error: RoomMessage.NotInRoom });
   }

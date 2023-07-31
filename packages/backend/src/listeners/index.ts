@@ -26,7 +26,7 @@ export const listeners = (server: Server, socket: Socket) => {
     handler: (options: HandlerOptions<TData, TResponse>) => void
   ) => {
     return (data: TData, ack: (res: SocketResponse<TResponse>) => void) => {
-      const session = server.sessionManager.getSessionBySocket(socket);
+      const session = server.sessionService.getSessionBySocket(socket);
       handler({ server, socket, session, data, ack });
     };
   };

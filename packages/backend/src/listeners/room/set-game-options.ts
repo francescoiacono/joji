@@ -6,10 +6,10 @@ type Options = HandlerOptions<GameOptions, Response>;
 
 export const setGameOptionsHandler = (options: Options) => {
   const { server, session, ack, data } = options;
-  const { roomManager } = server;
+  const { roomService } = server;
 
   // Make sure the room exists
-  const room = roomManager.getUserRoom(session.user.id);
+  const room = roomService.getUserRoom(session.user.id);
   if (!room) {
     return ack({ success: false, error: RoomMessage.NotInRoom });
   }

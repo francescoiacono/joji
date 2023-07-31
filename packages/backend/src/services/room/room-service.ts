@@ -3,19 +3,19 @@ import { Room, RoomEvents } from './room';
 import { EventEmitter } from '../event-emitter';
 import { User } from '../user';
 
-export type RoomManagerEvents = {
+export type RoomServiceEvents = {
   roomCreated: (data: { room: Room }) => void;
   roomDeleted: (data: { room: Room }) => void;
   roomUpdated: RoomEvents['roomUpdated'];
 };
 
-export class RoomManager {
-  public events: EventEmitter<RoomManagerEvents>;
+export class RoomService {
+  public events: EventEmitter<RoomServiceEvents>;
   private rooms: Map<Room['joinCode'], Room>;
   private roomUsers: Map<User['id'], Room['joinCode']>;
 
   constructor() {
-    this.events = new EventEmitter<RoomManagerEvents>();
+    this.events = new EventEmitter<RoomServiceEvents>();
     this.rooms = new Map();
     this.roomUsers = new Map();
   }
