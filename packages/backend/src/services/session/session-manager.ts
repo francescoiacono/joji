@@ -96,7 +96,7 @@ export class SessionManager {
    */
   private createSession(socket: Socket): Session {
     const id = this.generateSessionId(socket);
-    const user = this.userManager.createGuestUser();
+    const user = this.userManager.createGuestUser(socket.id);
     const session = new Session({ id, socketId: socket.id, user });
 
     // Assign the session

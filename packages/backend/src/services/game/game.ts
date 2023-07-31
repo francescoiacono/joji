@@ -7,17 +7,29 @@ import {
   GameStatus,
   GameType
 } from '@joji/types';
+import { EventEmitter } from '../event-emitter';
+
+export type GameEvents = {
+  gameStarted: (data: { game: Game }) => void;
+  gameStateUpdated: (data: { game: Game }) => void;
+  gameEnded: (data: { game: Game }) => void;
+};
 
 export abstract class Game<
   TOptions extends GameOptions = GameOptions,
   TState extends GameState = GameState
 > {
+  public events: EventEmitter<GameEvents>;
   abstract type: GameType;
   abstract optionsSchema: ObjectSchema<Partial<TOptions>>;
   abstract options: TOptions;
   abstract state: TState;
   protected status: GameStatus = GameStatus.Waiting;
   protected players: Array<GamePlayer> = [];
+
+  constructor() {
+    this.events = new EventEmitter<GameEvents>();
+  }
 
   /**
    * Validates the provided game options against the schema

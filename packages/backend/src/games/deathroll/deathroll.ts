@@ -22,6 +22,10 @@ export class Deathroll extends Game<DeathrollOptions, DeathrollState> {
 
   private currentPlayerIndex: number = 0;
 
+  constructor() {
+    super();
+  }
+
   updateOptions(options: DeathrollOptions): void {
     this.options = {
       ...this.options,
@@ -35,6 +39,8 @@ export class Deathroll extends Game<DeathrollOptions, DeathrollState> {
       currentCount: state.currentCount || this.state.currentCount,
       currentPlayerId: state.currentPlayerId || this.state.currentPlayerId
     };
+
+    this.events.emit('gameStateUpdated', { game: this });
   }
 
   start(players: Array<GamePlayer>): void {
@@ -44,6 +50,8 @@ export class Deathroll extends Game<DeathrollOptions, DeathrollState> {
       currentCount: this.options.startingValue,
       currentPlayerId: this.players[0]
     });
+
+    this.events.emit('gameStarted', { game: this });
   }
 
   takeTurn(): void {
@@ -71,5 +79,7 @@ export class Deathroll extends Game<DeathrollOptions, DeathrollState> {
 
   end() {
     super.end();
+
+    this.events.emit('gameEnded', { game: this });
   }
 }

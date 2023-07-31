@@ -181,6 +181,13 @@ export class Room {
   }
 
   /**
+   * Returns the current game
+   */
+  public getGame(): Game | null {
+    return this.game;
+  }
+
+  /**
    * Set the game options
    */
   public setGameOptions(options: Game['options']): void {
@@ -201,5 +208,22 @@ export class Room {
    */
   public areAllUsersOnline(): boolean {
     return this.users.every(u => u.isOnline);
+  }
+
+  /**
+   * Starts the game
+   */
+  public startGame(): void {
+    // If there is no game, do nothing
+    if (!this.game) {
+      return;
+    }
+
+    // Start the game
+    const players = this.users.map(u => u.userId);
+    this.game.start(players);
+
+    // Emit the roomUpdated event
+    this.events.emit('roomUpdated', { room: this });
   }
 }

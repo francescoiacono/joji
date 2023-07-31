@@ -21,7 +21,7 @@ export const setGameOptionsHandler = (options: Options) => {
 
   // Make sure a game is set
   if (!room.game) {
-    return ack({ success: false, error: RoomMessage.NoGame });
+    return ack({ success: false, error: RoomMessage.NoGameSelected });
   }
 
   // Make sure the game isn't in progress

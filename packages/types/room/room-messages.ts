@@ -7,10 +7,11 @@ export enum RoomMessage {
   RoomNotFound = 'ROOM_NOT_FOUND',
   GameNotFound = 'GAME_NOT_FOUND',
   GameInProgress = 'GAME_IN_PROGRESS',
-  NoGame = 'NO_GAME',
+  NoGameSelected = 'NO_GAME_SELECTED',
   NotHost = 'NOT_HOST',
   UserNotFound = 'USER_NOT_FOUND',
   CannotKickSelf = 'CANNOT_KICK_SELF',
   RoomFull = 'ROOM_FULL',
-  InvalidGameOptions = 'INVALID_GAME_OPTIONS'
+  InvalidGameOptions = 'INVALID_GAME_OPTIONS',
+  NotAllUsersReady = 'NOT_ALL_USERS_READY'
 }

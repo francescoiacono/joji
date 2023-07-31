@@ -1,5 +1,5 @@
 import { Server, Session } from '@/services';
-import { RoomEvent, SocketResponse } from '@joji/types';
+import { GameEvent, RoomEvent, SocketResponse } from '@joji/types';
 import {
   createRoomHandler,
   getRoomByJoinCodeHandler,
@@ -11,6 +11,7 @@ import {
   setGameOptionsHandler
 } from './room';
 import { Socket } from 'socket.io';
+import { startGameHandler } from './game';
 
 export interface HandlerOptions<TData, TResponse> {
   server: Server;
@@ -39,4 +40,7 @@ export const listeners = (server: Server, socket: Socket) => {
   socket.on(RoomEvent.KickUser, handler(kickUserHandler));
   socket.on(RoomEvent.SetGame, handler(setGameHandler));
   socket.on(RoomEvent.SetGameOptions, handler(setGameOptionsHandler));
+
+  // Game
+  socket.on(GameEvent.StartGame, handler(startGameHandler));
 };
