@@ -39,6 +39,8 @@ export class SessionManager {
       const existingSession = this.sessions.get(existingSessionId);
 
       if (existingSession) {
+        existingSession.addSocketId(socket.id);
+
         return existingSession;
       }
     }
@@ -54,10 +56,35 @@ export class SessionManager {
   }
 
   /**
+   * Called when a socket disconnects
+   */
+  public onSocketDisconnect(socket: Socket): void {
+    // Get the session ID from the socket
+    const sessionId = this.getSocketSessionId(socket);
+    if (!sessionId) {
+      return;
+    }
+
+    // If the session does not exist, return
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      return;
+    }
+
+    // Remove the socket ID from the session
+    session.removeSocketId(socket.id);
+
+    // Start the disconnect timeout if the session is empty
+    if (session.socketIds.size === 0) {
+      this.setDisconnectTimeout(session);
+    }
+  }
+
+  /**
    * Sets a timeout to delete the session if the client does not reconnect
    * within the given timeout
    */
-  public setDisconnectTimeout(session: Session): void {
+  private setDisconnectTimeout(session: Session): void {
     // Create a timeout to delete the session
     const timeout = setTimeout(() => {
       this.deleteSession(session);
@@ -96,8 +123,8 @@ export class SessionManager {
    */
   private createSession(socket: Socket): Session {
     const id = this.generateSessionId(socket);
-    const user = this.userManager.createGuestUser(socket.id);
-    const session = new Session({ id, socketId: socket.id, user });
+    const user = this.userManager.createGuestUser();
+    const session = new Session({ id, socketIds: new Set([socket.id]), user });
 
     // Assign the session
     this.sessions.set(id, session);

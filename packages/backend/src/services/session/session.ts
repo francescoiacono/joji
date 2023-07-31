@@ -4,19 +4,33 @@ import { SessionClient } from '@joji/types';
 
 export interface SessionOptions {
   id: string;
-  socketId: string;
+  socketIds: Set<Socket['id']>;
   user: User;
 }
 
 export class Session {
   public id: string;
-  public socketId: Socket['id'];
+  public socketIds: Set<Socket['id']>;
   public user: User;
 
   constructor(options: SessionOptions) {
     this.id = options.id;
-    this.socketId = options.socketId;
+    this.socketIds = options.socketIds;
     this.user = options.user;
+  }
+
+  /**
+   * Adds a socket ID to the session
+   */
+  public addSocketId(socketId: Socket['id']): void {
+    this.socketIds.add(socketId);
+  }
+
+  /**
+   * Removes a socket ID from the session
+   */
+  public removeSocketId(socketId: Socket['id']): void {
+    this.socketIds.delete(socketId);
   }
 
   /**

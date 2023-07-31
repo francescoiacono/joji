@@ -54,7 +54,7 @@ export class Server {
       // Handle the disconnect event
       socket.on('disconnect', () => {
         // Start the disconnect timeout
-        this.sessionManager.setDisconnectTimeout(session);
+        this.sessionManager.onSocketDisconnect(socket);
       });
     });
 
