@@ -1,6 +1,6 @@
 'use client';
 import { FC, useContext, useEffect, useState } from 'react';
-import { SocketEvent } from '@joji/types';
+import { SessionClient, SocketEvent } from '@joji/types';
 import { Socket, io } from 'socket.io-client';
 import { SocketContext } from '../contexts';
 
@@ -36,7 +36,8 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
 
     socketInstance.connect();
 
-    socketInstance.on(SocketEvent.Session, session => {
+    socketInstance.on(SocketEvent.Session, (session: SessionClient) => {
+      console.log('session', session);
       localStorage.setItem('sessionId', session.id);
     });
 
