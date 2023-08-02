@@ -6,4 +6,4 @@ var SocketEvent;
     // Server -> Client
     SocketEvent["Session"] = "SESSION";
     SocketEvent["Error"] = "ERROR";
-})(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
+})(SocketEvent || (exports.SocketEvent = SocketEvent = {}));
