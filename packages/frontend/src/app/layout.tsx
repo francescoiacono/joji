@@ -1,7 +1,8 @@
-import './globals.css';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
 import { SocketProvider, RoomProvider } from '@/components/providers';
+
+import '@/themes/styles/reset.linaria.global';
 
 export const metadata: Metadata = {
   title: 'Joji',

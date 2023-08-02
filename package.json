@@ -12,5 +12,11 @@
   "devDependencies": {
     "concurrently": "^8.2.0",
     "husky": "^8.0.3"
+  },
+  "dependencies": {
+    "@linaria/babel-preset": "^4.5.4",
+    "@linaria/core": "^4.5.4",
+    "@linaria/react": "^4.5.4",
+    "next-with-linaria": "^0.5.1"
   }
 }
