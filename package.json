@@ -5,10 +5,18 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "concurrently -n \"CLIENT,SERVER\" -c \"bgBlack.bold,bgMagenta.bold\" \"npm run dev --workspace=packages/frontend\" \"npm run dev --workspace=packages/backend\"",
     "prepare": "husky install",
     "build:types": "tsc -p packages/types"
   },
   "devDependencies": {
+    "concurrently": "^8.2.0",
     "husky": "^8.0.3"
+  },
+  "dependencies": {
+    "@linaria/babel-preset": "^4.5.4",
+    "@linaria/core": "^4.5.4",
+    "@linaria/react": "^4.5.4",
+    "next-with-linaria": "^0.5.1"
   }
 }

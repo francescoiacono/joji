@@ -6,4 +6,4 @@ var SocketMessage;
     SocketMessage["MissingData"] = "MISSING_DATA";
     SocketMessage["ValidationError"] = "VALIDATION_ERROR";
     SocketMessage["MethodNotAllowed"] = "METHOD_NOT_ALLOWED";
-})(SocketMessage = exports.SocketMessage || (exports.SocketMessage = {}));
+})(SocketMessage || (exports.SocketMessage = SocketMessage = {}));

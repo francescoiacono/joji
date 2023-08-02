@@ -4,4 +4,4 @@ exports.GameType = void 0;
 var GameType;
 (function (GameType) {
     GameType["Deathroll"] = "deathroll";
-})(GameType = exports.GameType || (exports.GameType = {}));
+})(GameType || (exports.GameType = GameType = {}));

@@ -15,4 +15,4 @@ var RoomEvent;
     RoomEvent["StartGame"] = "START_GAME";
     // Server -> Client
     RoomEvent["RoomUpdated"] = "ROOM_UPDATED";
-})(RoomEvent = exports.RoomEvent || (exports.RoomEvent = {}));
+})(RoomEvent || (exports.RoomEvent = RoomEvent = {}));
