@@ -2,6 +2,8 @@
 
 import Form from '@/components/ui/forms/form/form';
 import Input from '@/components/ui/input/input';
+import AvatarBubble from '../avatarBubble/avatarBubble';
+
 import { useState } from 'react';
 import { useRoom } from '@/components/providers';
 
@@ -20,7 +22,8 @@ const CreateRoomForm = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit} buttonText='Create'>
+    <Form onSubmit={handleSubmit} buttonText='Create a room'>
+      <AvatarBubble />
       <Input
         type='text'
         placeholder='Your username!'

@@ -4,6 +4,7 @@ export const wrapper = css`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: 100%;
 `;
 
 export const tabs = css`
@@ -12,7 +13,7 @@ export const tabs = css`
   justify-content: space-between;
   gap: 1rem;
   padding: 0 0.5rem;
-  height: 65px;
+  min-height: 65px;
   background: var(--primary-color);
   border-radius: var(--borderRadius);
 `;

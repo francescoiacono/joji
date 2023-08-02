@@ -10,5 +10,5 @@ export const primaryButton = css`
   width: 100%;
   font-size: var(--font-size-big);
   height: 50px;
-  margin: 1rem 0;
+  margin-bottom: 1rem;
 `;
