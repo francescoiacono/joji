@@ -2,10 +2,9 @@
 import Image from 'next/image';
 
 import { useState } from 'react';
+import { avatarsNames } from '@/utils';
 
 import * as styles from './avatarBubble.linaria';
-
-const avatarsNames = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png'];
 
 interface AvatarBubbleProps {
   updateAvatar: (avatar: string) => void;
