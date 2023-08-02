@@ -254,11 +254,10 @@ export class Room {
       return;
     }
 
-    // Start the game
+    // Get the player ids
     const players = this._users.map(u => u.userId);
-    this._game.start(players);
 
-    // Emit the roomUpdated event
-    this._events.emit('roomUpdated', { room: this });
+    // Start the game
+    this._game.start(players);
   }
 }

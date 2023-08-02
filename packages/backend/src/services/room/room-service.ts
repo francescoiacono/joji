@@ -147,7 +147,6 @@ export class RoomService {
    * Handle a room being updated
    */
   private handleRoomUpdated: RoomEvents['roomUpdated'] = data => {
-    // Emit events
     this.events.emit('roomUpdated', data);
   };
 }
