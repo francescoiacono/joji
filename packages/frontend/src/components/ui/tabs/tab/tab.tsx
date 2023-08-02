@@ -1,3 +1,5 @@
+import * as styles from './tab.linaria';
+
 interface TabProps {
   label: string;
   active: boolean;
@@ -7,10 +9,7 @@ interface TabProps {
 const Tab: React.FC<TabProps> = ({ label, active, onClick }) => (
   <div
     onClick={onClick}
-    style={{
-      cursor: 'pointer',
-      fontWeight: active ? 'bold' : 'normal'
-    }}
+    className={`${styles.tab} ${active ? styles.active : ''}`}
   >
     {label}
   </div>
