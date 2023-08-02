@@ -2,7 +2,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   labelText?: string;
 }
 
-const FormInput: React.FC<FormInputProps> = ({ labelText, ...props }) => {
+const Input: React.FC<FormInputProps> = ({ labelText, ...props }) => {
   return (
     <section>
       <label>{labelText}</label>
@@ -11,4 +11,4 @@ const FormInput: React.FC<FormInputProps> = ({ labelText, ...props }) => {
   );
 };
 
-export default FormInput;
+export default Input;

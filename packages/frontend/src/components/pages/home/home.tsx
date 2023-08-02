@@ -1,7 +1,15 @@
-import CreateRoomForm from './subcomponents/createRoomForm/createRoomForm';
+import Tabs from '@/components/ui/tabs/tabs';
+import RoomForm from './subcomponents/roomForm/roomForm';
 
 const Home = () => {
-  return <CreateRoomForm />;
+  return (
+    <Tabs
+      tabItems={[
+        { label: 'CREATE', component: <RoomForm /> },
+        { label: 'JOIN', component: <p>Hello</p> }
+      ]}
+    />
+  );
 };
 
 export default Home;

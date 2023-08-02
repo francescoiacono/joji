@@ -96,6 +96,7 @@
     socket.io "^4.7.1"
     uuid "^9.0.0"
     winston "^3.10.0"
+    yup "^1.2.0"
 
 "@joji/config@^1.0.0", "@joji/config@file:/Users/chicco/projects/joji/packages/config":
   version "1.0.0"

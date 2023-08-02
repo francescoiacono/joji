@@ -2,7 +2,7 @@
 
 import Form from '@/components/ui/forms/form/form';
 import FormTitle from '@/components/ui/forms/formTitle/formTitle';
-import FormInput from '@/components/ui/forms/formInput/formInput';
+import Input from '@/components/ui/input/input';
 import { useState } from 'react';
 import { useRoom } from '@/components/providers';
 
@@ -23,7 +23,7 @@ const CreateRoomForm = () => {
   return (
     <Form onSubmit={handleSubmit} buttonText='Create'>
       <FormTitle>Create Room</FormTitle>
-      <FormInput
+      <Input
         type='text'
         placeholder='Your username!'
         onChange={handleChange}
