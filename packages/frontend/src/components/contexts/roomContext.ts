@@ -9,6 +9,7 @@ interface RoomContextProps {
   joinRoom: (slug: string, displayName: string) => void;
   leaveRoom: () => void;
   setRoomGame: (game: GameType) => void;
+  setGameOptions: (options: any) => void;
 }
 
 export const RoomContext = createContext<RoomContextProps>({
@@ -18,5 +19,6 @@ export const RoomContext = createContext<RoomContextProps>({
   createRoom: () => {},
   joinRoom: () => {},
   leaveRoom: () => {},
-  setRoomGame: () => {}
+  setRoomGame: () => {},
+  setGameOptions: () => {}
 });

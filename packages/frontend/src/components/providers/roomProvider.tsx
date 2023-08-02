@@ -1,7 +1,13 @@
 'use client';
 
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { GameType, RoomClient, RoomEvent, SocketResponse } from '@joji/types';
+import {
+  GameOptions,
+  GameType,
+  RoomClient,
+  RoomEvent,
+  SocketResponse
+} from '@joji/types';
 import { useRouter } from 'next/navigation';
 import { useSocket } from './socketProvider';
 import { RoomContext } from '../contexts';
@@ -25,9 +31,11 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   );
 
   useEffect(() => {
-    const listener = (updatedRoom: RoomClient) =>
-      listenForRoomUpdates(updatedRoom);
+    const listener = (updatedRoom: RoomClient) => {
+      console.log('[ROOM UPDATED]', updatedRoom);
 
+      listenForRoomUpdates(updatedRoom);
+    };
     socket?.on(RoomEvent.RoomUpdated, listener);
 
     return () => {
@@ -188,6 +196,25 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
     [socket]
   );
 
+  const setGameOptions = useCallback(
+    (options: GameOptions) => {
+      if (!socket) return console.error('Socket not initialized');
+      console.log('[SET GAME OPTIONS]');
+      setLoading(true);
+      socket.emit(
+        RoomEvent.SetGameOptions,
+        options,
+        (response: SocketResponse<RoomClient>) => {
+          handleSocketResponse(response, room => {
+            setRoom(room);
+            console.log(room);
+          });
+        }
+      );
+    },
+    [socket]
+  );
+
   return (
     <RoomContext.Provider
       value={{
@@ -197,7 +224,8 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
         createRoom,
         joinRoom,
         leaveRoom,
-        setRoomGame
+        setRoomGame,
+        setGameOptions
       }}
     >
       {children}
