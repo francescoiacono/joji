@@ -6,15 +6,16 @@ export const tab = css`
   height: 50px;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--font-color-secondary);
   text-transform: uppercase;
   width: 100%;
-  border-radius: 18px;
+  border-radius: var(--borderRadius);
+  font-size: var(--font-size-big);
 `;
 
 export const active = css`
   font-weight: bold;
-  color: #fff;
-  background: #3a386a;
-  border: 3px solid #403e6f;
+  color: var(--font-color);
+  background: var(--secondary-color);
+  border: 3px solid var(--border-color);
 `;

@@ -14,6 +14,8 @@ export const globalStyles = css`
 
     body {
       line-height: 1.5;
+      background-color: var(--background-color);
+      color: var(--font-color-secondary);
       -webkit-font-smoothing: antialiased;
     }
 

@@ -1,7 +1,6 @@
 'use client';
 
 import Form from '@/components/ui/forms/form/form';
-import FormTitle from '@/components/ui/forms/formTitle/formTitle';
 import Input from '@/components/ui/input/input';
 import { useState } from 'react';
 import { useRoom } from '@/components/providers';
@@ -22,7 +21,6 @@ const CreateRoomForm = () => {
 
   return (
     <Form onSubmit={handleSubmit} buttonText='Create'>
-      <FormTitle>Create Room</FormTitle>
       <Input
         type='text'
         placeholder='Your username!'

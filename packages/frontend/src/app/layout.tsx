@@ -3,6 +3,7 @@ import { Nunito } from 'next/font/google';
 import { SocketProvider, RoomProvider } from '@/components/providers';
 
 import '@/theme/styles/reset.linaria.global';
+import '@/theme/styles/globals.linaria.global';
 
 export const metadata: Metadata = {
   title: 'Joji',

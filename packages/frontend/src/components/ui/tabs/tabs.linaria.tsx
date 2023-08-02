@@ -3,6 +3,7 @@ import { css } from '@linaria/core';
 export const wrapper = css`
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 `;
 
 export const tabs = css`
@@ -10,8 +11,8 @@ export const tabs = css`
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 5px;
+  padding: 0 0.5rem;
   height: 65px;
-  background: #18174a;
-  border-radius: 18px;
+  background: var(--primary-color);
+  border-radius: var(--borderRadius);
 `;

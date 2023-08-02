@@ -2,9 +2,11 @@
 
 import Form from '@/components/ui/forms/form/form';
 import FormTitle from '@/components/ui/forms/formTitle/formTitle';
-import FormInput from '@/components/ui/forms/formInput/formInput';
+
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
+import Input from '@/components/ui/input/input';
+import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
 
 interface JoinRoomFormProps {
   joinRoom: (slug: string, displayName: string) => void;
@@ -26,15 +28,17 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ joinRoom }) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit} buttonText='Join'>
-      <FormTitle>Join Room</FormTitle>
-      <FormInput
-        onChange={handleChange}
-        labelText='Display Name'
-        type='text'
-        placeholder='Your name!'
-      ></FormInput>
-    </Form>
+    <StyledContainer style={{ width: '500px', height: '650px' }}>
+      <Form onSubmit={handleSubmit} buttonText='Join'>
+        <FormTitle>Join Room</FormTitle>
+        <Input
+          onChange={handleChange}
+          labelText='Display Name'
+          type='text'
+          placeholder='Your name!'
+        ></Input>
+      </Form>
+    </StyledContainer>
   );
 };
 export default JoinRoomForm;
