@@ -4,7 +4,7 @@ import { GameType, RoomClient } from '@joji/types';
 interface RoomContextProps {
   room: RoomClient | null;
   loading: boolean;
-  createRoom: (displayName: string) => void;
+  createRoom: (displayName: string, avatar: string) => void;
   getRoom: (slug: string) => void;
   joinRoom: (slug: string, displayName: string) => void;
   leaveRoom: () => void;

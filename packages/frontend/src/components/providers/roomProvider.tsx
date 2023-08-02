@@ -71,14 +71,14 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
    */
 
   const createRoom = useCallback(
-    (displayName: string) => {
+    (displayName: string, avatar: string) => {
       if (!socket) return console.error('Socket not initialized');
       console.log('[CREATE ROOM]');
       setLoading(true);
 
       socket.emit(
         RoomEvent.CreateRoom,
-        { displayName },
+        { displayName, avatar },
         (response: SocketResponse<RoomClient>) => {
           handleSocketResponse(response, room => {
             setRoom(room);

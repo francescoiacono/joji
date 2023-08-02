@@ -11,4 +11,5 @@ export const primaryButton = css`
   font-size: var(--font-size-big);
   height: 50px;
   margin-bottom: 1rem;
+  cursor: pointer;
 `;

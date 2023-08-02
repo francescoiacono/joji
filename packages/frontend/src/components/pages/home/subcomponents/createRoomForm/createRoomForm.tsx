@@ -9,6 +9,7 @@ import { useRoom } from '@/components/providers';
 
 const CreateRoomForm = () => {
   const [displayName, setDisplayName] = useState<string>('');
+  const [avatar, setAvatar] = useState<string>('1.png');
 
   const { createRoom } = useRoom();
 
@@ -18,12 +19,12 @@ const CreateRoomForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createRoom(displayName);
+    createRoom(displayName, avatar);
   };
 
   return (
     <Form onSubmit={handleSubmit} buttonText='Create a room'>
-      <AvatarBubble />
+      <AvatarBubble updateAvatar={setAvatar} />
       <Input
         type='text'
         placeholder='Your username!'

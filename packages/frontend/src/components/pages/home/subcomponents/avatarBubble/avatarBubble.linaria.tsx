@@ -6,6 +6,8 @@ export const wrapper = css`
 `;
 
 export const bubble = css`
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,7 +15,6 @@ export const bubble = css`
   border: 3px solid var(--border-color);
   width: 200px;
   height: 200px;
-  overflow: hidden;
   margin: 1rem auto 0 auto;
   background-color: var(--primary-color);
 `;

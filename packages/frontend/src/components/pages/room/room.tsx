@@ -7,6 +7,7 @@ import { useRoom } from '@/components/providers';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { GameType } from '@joji/types';
+import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
 
 const Room = () => {
   let { slug } = useParams();
@@ -23,7 +24,7 @@ const Room = () => {
   return (
     <>
       {room && room?.isUserInRoom ? (
-        <>
+        <StyledContainer>
           <section>
             <h1>Room {slug}</h1>
             <p>Users:</p>
@@ -39,7 +40,7 @@ const Room = () => {
             <DeathrollOptions gameOptions={room.game.options} />
           )}
           <button onClick={() => leaveRoom()}>Leave Room</button>
-        </>
+        </StyledContainer>
       ) : (
         <JoinRoomForm joinRoom={joinRoom} />
       )}
