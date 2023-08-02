@@ -152,7 +152,9 @@ export class SessionService {
   private getSocketSessionId(socket: Socket): string | undefined {
     // If we're in development, allow the client to specify a session ID
     if (process.env.NODE_ENV === 'development') {
-      return socket.handshake.headers.session as string;
+      return (
+        socket.handshake.headers.session || socket.handshake.auth.sessionId
+      );
     }
 
     return socket.handshake.auth.sessionId;
