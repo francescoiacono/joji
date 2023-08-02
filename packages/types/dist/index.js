@@ -17,4 +17,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./game"), exports);
 __exportStar(require("./room"), exports);
 __exportStar(require("./room-user"), exports);
+__exportStar(require("./session"), exports);
 __exportStar(require("./sockets"), exports);
+__exportStar(require("./user"), exports);

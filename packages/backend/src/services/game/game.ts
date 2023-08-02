@@ -1,14 +1,38 @@
 import { ObjectSchema } from 'yup';
-import { GameClient, GameOptions, GameStatus, GameType } from '@joji/types';
+import {
+  GameClient,
+  GameOptions,
+  GamePlayer,
+  GameState,
+  GameStatus,
+  GameType
+} from '@joji/types';
+import { EventEmitter } from '../event-emitter';
 
-export abstract class Game<TOptions extends GameOptions = GameOptions> {
+export type GameEvents = {
+  gameStarted: (data: { game: Game }) => void;
+  gameStateUpdated: (data: { game: Game }) => void;
+  gameEnded: (data: { game: Game }) => void;
+};
+
+export abstract class Game<
+  TOptions extends GameOptions = GameOptions,
+  TState extends GameState = GameState
+> {
+  public events: EventEmitter<GameEvents>;
   abstract type: GameType;
   abstract optionsSchema: ObjectSchema<Partial<TOptions>>;
   abstract options: TOptions;
+  abstract state: TState;
   protected status: GameStatus = GameStatus.Waiting;
+  protected players: Array<GamePlayer> = [];
+
+  constructor() {
+    this.events = new EventEmitter<GameEvents>();
+  }
 
   /**
-   * Validates the options for the game
+   * Validates the provided game options against the schema
    */
   validateOptions(options: TOptions): boolean {
     try {
@@ -45,10 +69,35 @@ export abstract class Game<TOptions extends GameOptions = GameOptions> {
   }
 
   /**
+   * Returns the game state
+   */
+  public getState(): TState {
+    return this.state;
+  }
+
+  /**
+   * Starts the game
+   */
+  start(players: Array<GamePlayer>): void {
+    this.setStatus(GameStatus.InProgress);
+    this.players = players;
+  }
+
+  /**
+   * Ends the game
+   */
+  end(): void {
+    this.setStatus(GameStatus.Ended);
+    this.players = [];
+  }
+
+  /**
    * Updates the game options
    */
   abstract updateOptions(options: TOptions): void;
 
-  abstract start(): void;
-  abstract end(): void;
+  /**
+   * Updates the game state
+   */
+  abstract updateState(state: TState): void;
 }

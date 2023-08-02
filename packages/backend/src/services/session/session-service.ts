@@ -3,22 +3,29 @@ import { v4 as uuidv4 } from 'uuid';
 import { Session } from './session';
 import { SessionConfig } from '@joji/config';
 import { EventEmitter } from '../event-emitter';
+import { UserService } from '../user/user-manager';
 
-export type SessionManagerEvents = {
+interface SessionServiceOptions {
+  userService: UserService;
+}
+
+export type SessionServiceEvents = {
   sessionIdle: (data: { session: Session }) => void;
   sessionActive: (data: { session: Session }) => void;
   sessionCreated: (data: { session: Session }) => void;
   sessionDeleted: (data: { session: Session }) => void;
 };
 
-export class SessionManager {
-  public events: EventEmitter<SessionManagerEvents>;
+export class SessionService {
+  public events: EventEmitter<SessionServiceEvents>;
   private sessions: Map<Session['id'], Session>;
   private disconnectTimeouts: Map<Session['id'], NodeJS.Timeout> = new Map();
+  private userService: UserService;
 
-  constructor() {
-    this.events = new EventEmitter<SessionManagerEvents>();
+  constructor(options: SessionServiceOptions) {
+    this.events = new EventEmitter<SessionServiceEvents>();
     this.sessions = new Map();
+    this.userService = options.userService;
   }
 
   /**
@@ -32,6 +39,8 @@ export class SessionManager {
       const existingSession = this.sessions.get(existingSessionId);
 
       if (existingSession) {
+        existingSession.addSocketId(socket.id);
+
         return existingSession;
       }
     }
@@ -47,10 +56,44 @@ export class SessionManager {
   }
 
   /**
+   * Returns all sessions associated with the given user ID
+   */
+  public getSessionsByUserId(userId: Session['user']['id']): Session[] {
+    return Array.from(this.sessions.values()).filter(
+      session => session.user.id === userId
+    );
+  }
+
+  /**
+   * Called when a socket disconnects
+   */
+  public onSocketDisconnect(socket: Socket): void {
+    // Get the session ID from the socket
+    const sessionId = this.getSocketSessionId(socket);
+    if (!sessionId) {
+      return;
+    }
+
+    // If the session does not exist, return
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      return;
+    }
+
+    // Remove the socket ID from the session
+    session.removeSocketId(socket.id);
+
+    // Start the disconnect timeout if the session is empty
+    if (session.socketIds.length === 0) {
+      this.setDisconnectTimeout(session);
+    }
+  }
+
+  /**
    * Sets a timeout to delete the session if the client does not reconnect
    * within the given timeout
    */
-  public setDisconnectTimeout(session: Session): void {
+  private setDisconnectTimeout(session: Session): void {
     // Create a timeout to delete the session
     const timeout = setTimeout(() => {
       this.deleteSession(session);
@@ -89,7 +132,8 @@ export class SessionManager {
    */
   private createSession(socket: Socket): Session {
     const id = this.generateSessionId(socket);
-    const session = new Session({ id, socketId: socket.id });
+    const user = this.userService.createGuestUser();
+    const session = new Session({ id, socketIds: new Set([socket.id]), user });
 
     // Assign the session
     this.sessions.set(id, session);
@@ -106,6 +150,11 @@ export class SessionManager {
    * Returns the session ID associated with the given socket.
    */
   private getSocketSessionId(socket: Socket): string | undefined {
+    // If we're in development, allow the client to specify a session ID
+    if (process.env.NODE_ENV === 'development') {
+      return socket.handshake.headers.session as string;
+    }
+
     return socket.handshake.auth.sessionId;
   }
 

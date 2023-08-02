@@ -1,2 +1,3 @@
 export * from './room';
-export * from './room-manager';
+export * from './room-controller';
+export * from './room-service';

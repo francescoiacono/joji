@@ -1,11 +1,12 @@
 import { GameClient, GameOptions } from '../game';
 import { RoomUserClient } from '../room-user';
+import { UserClient } from '../user';
 
 export interface RoomClient {
   joinCode: string;
-  host: RoomUserClient | null;
+  host: UserClient['id'] | null;
+  game: GameClient<GameOptions> | null;
   users: Array<RoomUserClient>;
   isUserInRoom: boolean;
   isUserHost: boolean;
-  game: GameClient<GameOptions> | null;
 }

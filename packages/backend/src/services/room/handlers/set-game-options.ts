@@ -1,27 +1,29 @@
-import { HandlerOptions } from '..';
+import { RoomController } from '../room-controller';
+import { Handler } from '@/utils';
 import { GameOptions, GameStatus, RoomClient, RoomMessage } from '@joji/types';
 
-type Response = RoomClient | null;
-type Options = HandlerOptions<GameOptions, Response>;
+type Req = GameOptions;
+type Res = RoomClient;
+type Controller = RoomController;
 
-export const setGameOptionsHandler = (options: Options) => {
-  const { server, session, ack, data } = options;
-  const { roomManager } = server;
+export const setGameOptionsHandler: Handler<Req, Res, Controller> = options => {
+  const { data, ack, controller, session } = options;
+  const { roomService } = controller;
 
   // Make sure the room exists
-  const room = roomManager.getUserRoom(session.id);
+  const room = roomService.getUserRoom(session.user.id);
   if (!room) {
     return ack({ success: false, error: RoomMessage.NotInRoom });
   }
 
   // Make sure the user is the host
-  if (!room.isHost(session.id)) {
+  if (!room.isHost(session.user.id)) {
     return ack({ success: false, error: RoomMessage.NotHost });
   }
 
   // Make sure a game is set
   if (!room.game) {
-    return ack({ success: false, error: RoomMessage.NoGame });
+    return ack({ success: false, error: RoomMessage.NoGameSelected });
   }
 
   // Make sure the game isn't in progress
@@ -38,5 +40,5 @@ export const setGameOptionsHandler = (options: Options) => {
   room.game.updateOptions(data);
 
   // Acknowledge the request
-  return ack({ success: true, data: room.getClient(session.id) });
+  return ack({ success: true, data: room.getClient(session.user.id) });
 };
