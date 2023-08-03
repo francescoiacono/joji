@@ -35,7 +35,12 @@ const AvatarBubble: React.FC<AvatarBubbleProps> = ({ updateAvatar }) => {
         />
       </div>
       <div onClick={refreshAvatar} className={styles.refreshButton}>
-        R
+        <Image
+          src='/assets/icons/refresh_icon.svg'
+          width={20}
+          height={20}
+          alt='Refresh'
+        />
       </div>
     </div>
   );

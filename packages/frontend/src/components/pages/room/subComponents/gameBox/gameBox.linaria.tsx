@@ -15,6 +15,7 @@ export const box = css`
 
   &:hover {
     filter: opacity(1) brightness(2);
+    cursor: pointer;
   }
 `;
 

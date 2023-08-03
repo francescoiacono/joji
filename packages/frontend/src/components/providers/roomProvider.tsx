@@ -20,7 +20,6 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const router = useRouter();
   const [room, setRoom] = useState<RoomClient | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
   const { socket } = useSocket();
 
   const listenForRoomUpdates = useCallback(
@@ -31,188 +30,83 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   );
 
   useEffect(() => {
-    const listener = (updatedRoom: RoomClient) => {
-      console.log('[ROOM UPDATED]', updatedRoom);
-
+    const listener = (updatedRoom: RoomClient) =>
       listenForRoomUpdates(updatedRoom);
-    };
     socket?.on(RoomEvent.RoomUpdated, listener);
 
     return () => {
-      socket?.off(RoomEvent.RoomUpdated);
+      socket?.off(RoomEvent.RoomUpdated, listener);
+      return;
     };
   }, [socket, listenForRoomUpdates]);
 
   /**
-   * Handles the response from the socket
-   * @param response is the response from the socket
-   * @param callback is the callback function to be called if the response is successful
-   *
+   * emitWithResponse()
+   * This pattern involves emitting a socket event,
+   * waiting for a response, and then performing some action based on that response
    */
 
-  const handleSocketResponse = (
-    response: SocketResponse<RoomClient>,
-    callback: (room: RoomClient) => void
-  ) => {
-    if (!response.success) {
-      const { error } = response;
-      console.error('Error:', error);
-    } else {
+  const emitWithResponse = useCallback(
+    async (
+      event: RoomEvent,
+      payload: object,
+      callback: (room: RoomClient) => void
+    ) => {
+      if (!socket) throw new Error('Socket not initialized');
+      setLoading(true);
+
+      const response: SocketResponse<RoomClient> = await new Promise(resolve =>
+        socket.emit(event, payload, resolve)
+      );
+
+      if (!response.success) {
+        throw new Error(response.error);
+      }
+
       const room = response.data;
       callback(room);
-    }
-    setLoading(false);
-  };
+      setLoading(false);
+    },
+    [socket]
+  );
 
-  /**
-   * Creates a new room with host
-   * @param displayName is the host name
-   *
-   */
+  // The following functions are used to interact with the room
 
   const createRoom = useCallback(
-    (displayName: string, avatar: string) => {
-      if (!socket) return console.error('Socket not initialized');
-      console.log('[CREATE ROOM]');
-      setLoading(true);
-
-      socket.emit(
-        RoomEvent.CreateRoom,
-        { displayName, avatar },
-        (response: SocketResponse<RoomClient>) => {
-          handleSocketResponse(response, room => {
-            setRoom(room);
-            console.log(room);
-            router.push(`/room/${room.joinCode}`);
-          });
-        }
-      );
-    },
-    [socket, router]
+    (displayName: string, avatar: string) =>
+      emitWithResponse(RoomEvent.CreateRoom, { displayName, avatar }, room => {
+        setRoom(room);
+        router.push(`/room/${room.joinCode}`);
+      }),
+    [emitWithResponse, router]
   );
-
-  /**
-   * Gets a room by join code
-   * @param joinCode
-   *
-   */
 
   const getRoom = useCallback(
-    (joinCode: string) => {
-      if (!socket) return console.error('Socket not initialized');
-      console.log('[GET ROOM]');
-      setLoading(true);
-
-      socket.emit(
-        RoomEvent.GetRoomByJoinCode,
-        { joinCode },
-        (response: SocketResponse<RoomClient>) => {
-          handleSocketResponse(response, room => {
-            setRoom(room);
-            console.log(room);
-          });
-        }
-      );
-    },
-    [socket]
+    (joinCode: string) =>
+      emitWithResponse(RoomEvent.GetRoomByJoinCode, { joinCode }, setRoom),
+    [emitWithResponse]
   );
-
-  /**
-   * Joins a room by room code
-   * @param roomCode is the join code of the room
-   * @param displayName is the name of the user
-   *
-   */
 
   const joinRoom = useCallback(
-    (roomCode: string, displayName: string) => {
-      if (!socket) return console.error('Socket not initialized');
-      console.log('[JOIN ROOM]');
-
-      setLoading(true);
-
-      socket.emit(
-        RoomEvent.JoinRoom,
-        { roomCode, displayName },
-        (response: SocketResponse<RoomClient>) => {
-          handleSocketResponse(response, room => {
-            setRoom(room);
-            console.log(room);
-          });
-        }
-      );
-    },
-    [socket]
+    (roomCode: string, displayName: string) =>
+      emitWithResponse(RoomEvent.JoinRoom, { roomCode, displayName }, setRoom),
+    [emitWithResponse]
   );
 
-  /**
-   * Leaves a room
-   *
-   */
-
-  const leaveRoom = useCallback(() => {
-    if (!socket) return console.error('Socket not initialized');
-
-    console.log('[LEAVE ROOM]');
-
-    setLoading(true);
-    socket.emit(
-      RoomEvent.LeaveRoom,
-      {},
-      (response: SocketResponse<RoomClient>) => {
-        handleSocketResponse(response, room => {
-          setRoom(room);
-          console.log(room);
-        });
-      }
-    );
-  }, [socket]);
-
-  /**
-   * Sets the game of the room
-   * @param game is the game to be set
-   * @param callback is the callback function to be called if the response is successful
-   *
-   */
+  const leaveRoom = useCallback(
+    () => emitWithResponse(RoomEvent.LeaveRoom, {}, setRoom),
+    [emitWithResponse]
+  );
 
   const setRoomGame = useCallback(
-    (game: GameType) => {
-      if (!socket) return console.error('Socket not initialized');
-
-      console.log('[SET ROOM GAME]');
-
-      setLoading(true);
-      socket.emit(
-        RoomEvent.SetGame,
-        { game },
-        (response: SocketResponse<RoomClient>) => {
-          handleSocketResponse(response, room => {
-            setRoom(room);
-            console.log(room);
-          });
-        }
-      );
-    },
-    [socket]
+    (game: GameType) => emitWithResponse(RoomEvent.SetGame, { game }, setRoom),
+    [emitWithResponse]
   );
 
   const setGameOptions = useCallback(
-    (options: GameOptions) => {
-      if (!socket) return console.error('Socket not initialized');
-      console.log('[SET GAME OPTIONS]');
-      setLoading(true);
-      socket.emit(
-        RoomEvent.SetGameOptions,
-        options,
-        (response: SocketResponse<RoomClient>) => {
-          handleSocketResponse(response, room => {
-            setRoom(room);
-            console.log(room);
-          });
-        }
-      );
-    },
-    [socket]
+    (options: GameOptions) =>
+      emitWithResponse(RoomEvent.SetGameOptions, options, setRoom),
+    [emitWithResponse]
   );
 
   return (

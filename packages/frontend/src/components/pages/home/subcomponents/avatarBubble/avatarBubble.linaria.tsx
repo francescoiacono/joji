@@ -26,8 +26,8 @@ export const refreshButton = css`
   margin: 0.5rem;
   background-color: var(--border-color);
   border: none;
-  border-radius: var(--borderRadius);
-  padding: 0.25rem 0.7rem;
+  border-radius: 100%;
+  padding: 0.3rem;
   color: var(--font-color);
 
   transition: all 0.2s ease-in-out;
@@ -35,5 +35,6 @@ export const refreshButton = css`
   &:hover {
     cursor: pointer;
     font-weight: bold;
+    transform: scale(1.1);
   }
 `;

@@ -14,12 +14,14 @@ const UserStrip: React.FC<UserStripProps> = ({ user }) => {
     <div className={styles.wrapper}>
       <div className={styles.userInfo}>
         <div className={styles.bubble}>
-          <Image
-            width={50}
-            height={50}
-            src={`/assets/avatars/${avatar ? avatar : '1.png'}`}
-            alt='avatar'
-          />
+          <div className={styles.avatar}>
+            <Image
+              layout='fill'
+              objectFit='cover'
+              src={`/assets/avatars/${avatar ? avatar : '1.png'}`}
+              alt='avatar'
+            />
+          </div>
         </div>
         <p className={styles.name}>{displayName}</p>
       </div>
