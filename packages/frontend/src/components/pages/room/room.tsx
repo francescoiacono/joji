@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 
 import * as styles from './room.linaria';
+import SecondaryButton from '@/components/ui/buttons/secondaryButton/secondaryButton';
 
 const Room = () => {
   let { slug } = useParams();
@@ -26,16 +27,16 @@ const Room = () => {
   return (
     <>
       {room && room?.isUserInRoom ? (
-        <>
-          <StyledContainer style={{ width: '80%' }}>
+        <section className={styles.wrapper}>
+          <StyledContainer>
             <div className={styles.container}>
               <UsersList users={room.users} />
               <div className={styles.divider}></div>
               <SelectGame />
             </div>
           </StyledContainer>
-          <button onClick={() => leaveRoom()}>Leave Room</button>
-        </>
+          <SecondaryButton onClick={() => leaveRoom()}>Leave</SecondaryButton>
+        </section>
       ) : (
         <JoinRoomForm joinRoom={joinRoom} />
       )}

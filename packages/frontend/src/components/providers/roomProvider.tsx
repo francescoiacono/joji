@@ -42,7 +42,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
 
   /**
    * emitWithResponse()
-   * This pattern involves emitting a socket event,
+   * This function involves emitting a socket event,
    * waiting for a response, and then performing some action based on that response
    */
 
@@ -75,6 +75,7 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const createRoom = useCallback(
     (displayName: string, avatar: string) =>
       emitWithResponse(RoomEvent.CreateRoom, { displayName, avatar }, room => {
+        console.log('[Created room]', room);
         setRoom(room);
         router.push(`/room/${room.joinCode}`);
       }),
@@ -83,29 +84,46 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
 
   const getRoom = useCallback(
     (joinCode: string) =>
-      emitWithResponse(RoomEvent.GetRoomByJoinCode, { joinCode }, setRoom),
+      emitWithResponse(RoomEvent.GetRoomByJoinCode, { joinCode }, room => {
+        console.log('[Get room]', room);
+        setRoom(room);
+      }),
     [emitWithResponse]
   );
 
   const joinRoom = useCallback(
     (roomCode: string, displayName: string) =>
-      emitWithResponse(RoomEvent.JoinRoom, { roomCode, displayName }, setRoom),
+      emitWithResponse(RoomEvent.JoinRoom, { roomCode, displayName }, room => {
+        console.log('[Join room]', room);
+        setRoom(room);
+      }),
     [emitWithResponse]
   );
 
   const leaveRoom = useCallback(
-    () => emitWithResponse(RoomEvent.LeaveRoom, {}, setRoom),
+    () =>
+      emitWithResponse(RoomEvent.LeaveRoom, {}, room => {
+        console.log('[Leave room]', room);
+        setRoom(room);
+      }),
     [emitWithResponse]
   );
 
   const setRoomGame = useCallback(
-    (game: GameType) => emitWithResponse(RoomEvent.SetGame, { game }, setRoom),
+    (game: GameType) =>
+      emitWithResponse(RoomEvent.SetGame, { game }, room => {
+        console.log('[Set room game]', room);
+        setRoom(room);
+      }),
     [emitWithResponse]
   );
 
   const setGameOptions = useCallback(
     (options: GameOptions) =>
-      emitWithResponse(RoomEvent.SetGameOptions, options, setRoom),
+      emitWithResponse(RoomEvent.SetGameOptions, options, room => {
+        console.log('[Get room game options]', room);
+        setRoom(room);
+      }),
     [emitWithResponse]
   );
 
