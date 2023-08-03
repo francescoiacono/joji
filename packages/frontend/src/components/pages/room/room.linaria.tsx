@@ -2,8 +2,11 @@ import { css } from '@linaria/core';
 
 export const container = css`
   display: flex;
-  justify-content: flex-start;
-  width: 90%;
-  margin: 1rem auto;
-  gap: 1rem;
+  height: 100%;
+  justify-content: space-between;
+`;
+
+export const divider = css`
+  width: 3px;
+  background-color: var(--border-color);
 `;

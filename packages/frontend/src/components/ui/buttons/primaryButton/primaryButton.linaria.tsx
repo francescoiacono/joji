@@ -9,7 +9,7 @@ export const primaryButton = css`
   border-radius: var(--borderRadius);
   width: 100%;
   font-size: var(--font-size-big);
-  height: 50px;
+  height: 78px;
   margin-bottom: 1rem;
   cursor: pointer;
 `;

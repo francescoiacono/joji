@@ -1,8 +1,9 @@
-import PrimaryButton from '@/components/ui/buttons/primaryButton/primaryButton';
 import { useRoom } from '@/components/providers';
-import { GameType } from '@joji/types';
-import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
 import DeathrollOptions from '../gameOptions/deathrollOptions/deathrollOptions';
+import { GameType } from '@joji/types';
+
+import * as styles from './selectGame.linaria';
+import GameBox from '../gameBox/gameBox';
 
 const SelectGame: React.FC = () => {
   const { setRoomGame, room } = useRoom();
@@ -12,16 +13,20 @@ const SelectGame: React.FC = () => {
   };
 
   return (
-    <StyledContainer style={{ width: '100%' }}>
-      <label>Select Game </label>
-      <PrimaryButton onClick={() => handleClick(GameType.Deathroll)}>
+    <div className={styles.container}>
+      <h2>Select Game </h2>
+      <GameBox
+        onClick={() => handleClick(GameType.Deathroll)}
+        selected={room?.game?.type === GameType.Deathroll}
+        icon='/assets/icons/dice_icon.svg'
+      >
         Deathroll
-      </PrimaryButton>
+      </GameBox>
 
       {room?.game?.type === GameType.Deathroll && (
         <DeathrollOptions gameOptions={room.game.options} />
       )}
-    </StyledContainer>
+    </div>
   );
 };
 

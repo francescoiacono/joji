@@ -1,8 +1,9 @@
 import PrimaryButton from '@/components/ui/buttons/primaryButton/primaryButton';
+import Input from '@/components/ui/input/input';
+
 import { useState } from 'react';
 import { DeathrollOptions as Options, RoomEvent } from '@joji/types';
 import { useRoom } from '@/components/providers';
-import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
 
 interface DeathrollOptionsProps {
   gameOptions: Options;
@@ -26,18 +27,18 @@ const DeathrollOptions: React.FC<DeathrollOptionsProps> = ({ gameOptions }) => {
   };
 
   return (
-    <StyledContainer style={{ borderRadius: '18px' }}>
+    <>
       <h2>Deathroll Options</h2>
       <div>
         <label>Starting Value</label>
-        <input
+        <Input
           type='number'
           value={options.startingValue}
           onChange={handleChange}
         />
       </div>
       <PrimaryButton onClick={handleClick}>Start Game</PrimaryButton>
-    </StyledContainer>
+    </>
   );
 };
 

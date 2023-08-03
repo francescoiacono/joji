@@ -2,13 +2,12 @@
 
 import JoinRoomForm from './subComponents/joinRoomForm/joinRoomForm';
 import SelectGame from './subComponents/selectGame/selectGame';
-import DeathrollOptions from './subComponents/gameOptions/deathrollOptions/deathrollOptions';
 import UsersList from './subComponents/usersList/usersList';
+import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
 
 import { useRoom } from '@/components/providers';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { GameType } from '@joji/types';
 
 import * as styles from './room.linaria';
 
@@ -27,13 +26,16 @@ const Room = () => {
   return (
     <>
       {room && room?.isUserInRoom ? (
-        <section>
-          <div className={styles.container}>
-            <UsersList users={room.users} />
-            <SelectGame />
-          </div>
+        <>
+          <StyledContainer style={{ width: '80%' }}>
+            <div className={styles.container}>
+              <UsersList users={room.users} />
+              <div className={styles.divider}></div>
+              <SelectGame />
+            </div>
+          </StyledContainer>
           <button onClick={() => leaveRoom()}>Leave Room</button>
-        </section>
+        </>
       ) : (
         <JoinRoomForm joinRoom={joinRoom} />
       )}

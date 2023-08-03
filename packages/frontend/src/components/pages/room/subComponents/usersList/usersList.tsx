@@ -1,6 +1,7 @@
-import { RoomUserClient } from '@joji/types';
 import UserStrip from './userStrip/userStrip';
-import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
+
+import { RoomUserClient } from '@joji/types';
+import { useRoom } from '@/components/providers';
 
 import * as styles from './usersList.linaria';
 
@@ -10,14 +11,14 @@ interface usersListProps {
 
 const UsersList: React.FC<usersListProps> = ({ users }) => {
   return (
-    <StyledContainer style={{ width: '100%' }}>
+    <div className={styles.container}>
       <h2>Players ({users.length})</h2>
-      <div className={styles.container}>
+      <div>
         {users.map((user, i) => (
           <UserStrip key={i} user={user} />
         ))}
       </div>
-    </StyledContainer>
+    </div>
   );
 };
 

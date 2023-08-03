@@ -3,7 +3,6 @@ import { css } from '@linaria/core';
 export const wrapper = css`
   background-color: var(--tertiary-color);
   border-radius: var(--borderRadius);
-  padding: 1rem;
   margin: 1rem auto;
 
   display: flex;

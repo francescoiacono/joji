@@ -28,9 +28,11 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ joinRoom }) => {
   };
 
   return (
-    <StyledContainer style={{ width: '500px', height: '250px' }}>
+    <StyledContainer
+      style={{ width: '500px', height: '300px', padding: '1rem' }}
+    >
       <Form onSubmit={handleSubmit} buttonText='Join'>
-        <FormTitle>Join Room</FormTitle>
+        <FormTitle>joji.gg</FormTitle>
         <Input
           onChange={handleChange}
           labelText='Display Name'
