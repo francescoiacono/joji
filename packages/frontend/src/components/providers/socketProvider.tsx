@@ -1,4 +1,6 @@
 'use client';
+import Spinner from '../ui/spinner/spinner';
+
 import { FC, useContext, useEffect, useState } from 'react';
 import { SessionClient, SocketEvent } from '@joji/types';
 import { Socket, io } from 'socket.io-client';
@@ -45,7 +47,7 @@ export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
     setLoading(false);
   };
 
-  if (loading && !socket) return <p>Loading...</p>;
+  if (loading && !socket) return <Spinner large />;
 
   return (
     <SocketContext.Provider value={{ socket }}>

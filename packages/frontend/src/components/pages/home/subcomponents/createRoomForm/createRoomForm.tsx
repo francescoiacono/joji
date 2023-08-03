@@ -11,7 +11,7 @@ const CreateRoomForm = () => {
   const [displayName, setDisplayName] = useState<string>('');
   const [avatar, setAvatar] = useState<string>('1.png');
 
-  const { createRoom } = useRoom();
+  const { loading, createRoom } = useRoom();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDisplayName(e.target.value);
@@ -23,7 +23,7 @@ const CreateRoomForm = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit} buttonText='Create a room'>
+    <Form loading={loading} onSubmit={handleSubmit} buttonText='Create a room'>
       <AvatarBubble updateAvatar={setAvatar} />
       <Input
         type='text'

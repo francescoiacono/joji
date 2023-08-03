@@ -19,7 +19,7 @@ interface RoomProviderProps {
 export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const router = useRouter();
   const [room, setRoom] = useState<RoomClient | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const { socket } = useSocket();
 
   const listenForRoomUpdates = useCallback(

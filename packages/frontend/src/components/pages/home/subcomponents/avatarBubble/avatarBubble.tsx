@@ -1,5 +1,7 @@
 'use client';
+
 import Image from 'next/image';
+import Spinner from '@/components/ui/spinner/spinner';
 
 import { useState } from 'react';
 import { avatarsNames } from '@/utils';
@@ -25,7 +27,7 @@ const AvatarBubble: React.FC<AvatarBubbleProps> = ({ updateAvatar }) => {
     <div className={styles.wrapper}>
       <label>Avatar</label>
       <div className={styles.bubble}>
-        {loading && <p>Loading...</p>}
+        {loading && <Spinner large />}
         <Image
           src={`/assets/avatars/${avatarName}`}
           layout='fill'

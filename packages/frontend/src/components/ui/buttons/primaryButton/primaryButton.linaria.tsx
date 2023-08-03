@@ -1,6 +1,10 @@
 import { css } from '@linaria/core';
 
 export const primaryButton = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
   text-transform: uppercase;
   font-weight: bold;
   color: var(--font-color);
