@@ -2,5 +2,8 @@ export enum GameEvent {
   // Server -> Client
   GameStarted = 'GAME_STARTED',
   GameStateUpdated = 'GAME_STATE_UPDATED',
-  GameEnded = 'GAME_ENDED'
+  GameEnded = 'GAME_ENDED',
+
+  // Client -> Server
+  DeathrollRoll = 'DEATHROLL_ROLL'
 }

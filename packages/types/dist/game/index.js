@@ -16,6 +16,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./game"), exports);
 __exportStar(require("./game-events"), exports);
+__exportStar(require("./game-messages"), exports);
 __exportStar(require("./game-options"), exports);
 __exportStar(require("./game-player"), exports);
 __exportStar(require("./game-state"), exports);

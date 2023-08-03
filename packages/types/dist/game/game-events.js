@@ -7,4 +7,6 @@ var GameEvent;
     GameEvent["GameStarted"] = "GAME_STARTED";
     GameEvent["GameStateUpdated"] = "GAME_STATE_UPDATED";
     GameEvent["GameEnded"] = "GAME_ENDED";
+    // Client -> Server
+    GameEvent["DeathrollRoll"] = "DEATHROLL_ROLL";
 })(GameEvent = exports.GameEvent || (exports.GameEvent = {}));

@@ -100,4 +100,9 @@ export abstract class Game<
    * Updates the game state
    */
   abstract updateState(state: TState): void;
+
+  /**
+   * Takes a turn in the game
+   */
+  abstract takeTurn(): void;
 }
