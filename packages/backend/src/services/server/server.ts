@@ -1,4 +1,4 @@
-import { RoomController, SessionService } from '@/services';
+import { GameController, RoomController, SessionService } from '@/services';
 import { logger } from '@/utils/logger';
 import { Server as IOServer } from 'socket.io';
 import { SocketEvent } from '@joji/types';
@@ -12,6 +12,7 @@ export class Server {
   private sessionService: SessionService;
   private userService: UserService;
   private roomController: RoomController;
+  private gameController: GameController;
   private io: IOServer;
 
   constructor() {
@@ -19,6 +20,11 @@ export class Server {
     this.userService = new UserService();
     this.sessionService = new SessionService({ userService: this.userService });
     this.roomController = new RoomController(this.io, this.sessionService);
+    this.gameController = new GameController(
+      this.io,
+      this.sessionService,
+      this.roomController.roomService
+    );
   }
 
   /**

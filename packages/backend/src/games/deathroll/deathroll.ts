@@ -63,6 +63,10 @@ export class Deathroll extends Game<DeathrollOptions, DeathrollState> {
 
     // If the count is 1, end the game
     if (newCount === 1) {
+      this.updateState({
+        ...this.state,
+        currentCount: newCount
+      });
       this.end();
       return;
     }
@@ -79,7 +83,6 @@ export class Deathroll extends Game<DeathrollOptions, DeathrollState> {
 
   end() {
     super.end();
-
     this.events.emit('gameEnded', { game: this });
   }
 }

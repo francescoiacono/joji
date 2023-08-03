@@ -1,5 +1,5 @@
 import { handler } from '@/utils';
-import { RoomEvent } from '@joji/types';
+import { GameEvent, RoomEvent } from '@joji/types';
 import { Server, Socket } from 'socket.io';
 import { RoomService } from './room-service';
 import { Session, SessionService } from '../session';
@@ -15,6 +15,7 @@ import {
   startGameHandler
 } from './handlers';
 import { RoomEvents } from './room';
+import { GameEvents } from '../game';
 
 export class RoomController {
   private _roomService: RoomService;
@@ -132,6 +133,31 @@ export class RoomController {
         this.io
           .to(socketIds)
           .emit(RoomEvent.RoomUpdated, data.room.getClient(userId));
+
+        // Game events
+        const onGameStarted: GameEvents['gameStarted'] = data => {
+          const client = data.game.getState();
+          this.io.to(socketIds).emit(GameEvent.GameStarted, client);
+        };
+        const onGameUpdated: GameEvents['gameStateUpdated'] = data => {
+          const client = data.game.getState();
+          this.io.to(socketIds).emit(GameEvent.GameStateUpdated, client);
+        };
+        const onGameEnded: GameEvents['gameEnded'] = data => {
+          const client = data.game.getState();
+          this.io.to(socketIds).emit(GameEvent.GameEnded, client);
+        };
+
+        data.room.game?.events.on('gameStarted', onGameStarted);
+        data.room.game?.events.on('gameStateUpdated', onGameUpdated);
+        data.room.game?.events.on('gameEnded', onGameEnded);
+
+        // Remove the game event listeners when the room is updated
+        data.room.events.on('roomUpdated', () => {
+          data.room.game?.events.off('gameStarted', onGameStarted);
+          data.room.game?.events.off('gameStateUpdated', onGameUpdated);
+          data.room.game?.events.off('gameEnded', onGameEnded);
+        });
       });
     };
     this.roomService.events.on('roomUpdated', onRoomUpdated);
