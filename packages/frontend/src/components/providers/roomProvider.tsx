@@ -53,7 +53,6 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
       callback: (room: RoomClient) => void
     ) => {
       if (!socket) throw new Error('Socket not initialized');
-      setLoading(true);
 
       const response: SocketResponse<RoomClient> = await new Promise(resolve =>
         socket.emit(event, payload, resolve)
@@ -65,7 +64,6 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
 
       const room = response.data;
       callback(room);
-      setLoading(false);
     },
     [socket]
   );
@@ -75,9 +73,12 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   const createRoom = useCallback(
     (displayName: string, avatar: string) =>
       emitWithResponse(RoomEvent.CreateRoom, { displayName, avatar }, room => {
+        setLoading(true);
         console.log('[Created room]', room);
+
         setRoom(room);
         router.push(`/room/${room.joinCode}`);
+        setLoading(false);
       }),
     [emitWithResponse, router]
   );
