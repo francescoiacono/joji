@@ -6,10 +6,10 @@ import * as styles from './selectGame.linaria';
 import GameBox from '../gameBox/gameBox';
 
 const SelectGame: React.FC = () => {
-  const { setRoomGame, room } = useRoom();
+  const { setGame, room } = useRoom();
 
   const handleClick = (game: GameType) => {
-    setRoomGame(game);
+    setGame(game);
   };
 
   return (

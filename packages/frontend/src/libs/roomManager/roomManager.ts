@@ -127,6 +127,12 @@ class RoomManager {
     );
   }
 
+  startGame() {
+    this.socket.emit(RoomEvent.StartGame, null, (room: RoomClient) => {
+      this.room = room;
+    });
+  }
+
   /**
    * This function emits a set game event to the server.
    */

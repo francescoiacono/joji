@@ -1,27 +1,16 @@
 'use client';
 
 import { useRoom, useSocket } from '@/components/providers';
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { DeathrollState, GameEvent, SocketSuccessResponse } from '@joji/types';
 
 const DeathrollGame = () => {
-  const { getRoom, room } = useRoom();
-  const { game } = room || {};
-  const { options } = game || {};
-  const { startingValue } = options || {};
+  const { room } = useRoom();
   const { socket } = useSocket();
-  const { slug } = useParams();
 
   const [number, setNumber] = useState<number | undefined>(
-    startingValue || undefined
+    room?.game?.options.startingValue
   );
-
-  useEffect(() => {
-    if (typeof slug === 'string') {
-      getRoom(slug);
-    }
-  }, []);
 
   const roll = () => {
     socket?.emit(

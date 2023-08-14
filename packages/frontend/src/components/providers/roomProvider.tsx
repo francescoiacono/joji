@@ -15,6 +15,7 @@ interface RoomContextProps {
   leaveRoom: () => void;
   setGame: (game: GameType) => void;
   setGameOptions: (options: GameOptions) => void;
+  startGame: () => void;
 }
 
 const RoomContext = createContext<RoomContextProps | null>(null);
@@ -47,7 +48,8 @@ export const RoomProvider = (props: RoomProviderProps) => {
         joinRoom: roomManager.joinRoom.bind(roomManager),
         leaveRoom: roomManager.leaveRoom.bind(roomManager),
         setGame: roomManager.setGame.bind(roomManager),
-        setGameOptions: roomManager.setGameOptions.bind(roomManager)
+        setGameOptions: roomManager.setGameOptions.bind(roomManager),
+        startGame: roomManager.startGame.bind(roomManager)
       }}
     >
       {children}
