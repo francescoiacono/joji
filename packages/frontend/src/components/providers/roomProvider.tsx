@@ -1,144 +1,53 @@
 'use client';
-
-import { useCallback, useContext, useEffect, useState } from 'react';
-import {
-  GameOptions,
-  GameType,
-  RoomClient,
-  RoomEvent,
-  SocketResponse
-} from '@joji/types';
-import { useRouter } from 'next/navigation';
+import { GameOptions, GameType, RoomClient, RoomEvent } from '@joji/types';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useSocket } from './socketProvider';
-import { RoomContext } from '../contexts';
+import { RoomManager } from '@/libs/roomManager';
 
 interface RoomProviderProps {
   children: React.ReactNode;
 }
 
-export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
-  const router = useRouter();
-  const [room, setRoom] = useState<RoomClient | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const { socket } = useSocket();
+interface RoomContextProps {
+  room: RoomClient | null;
+  createRoom: (displayName: string, avatar: string) => void;
+  joinRoom: (roomCode: string, displayName: string) => void;
+  leaveRoom: () => void;
+  setGame: (game: GameType) => void;
+  setGameOptions: (options: GameOptions) => void;
+}
 
-  const listenForRoomUpdates = useCallback(
-    (updatedRoom: RoomClient) => {
-      setRoom(updatedRoom);
-    },
-    [room]
-  );
+const RoomContext = createContext<RoomContextProps | null>(null);
+
+export const RoomProvider = (props: RoomProviderProps) => {
+  const { socket } = useSocket();
+  const { children } = props;
+  const roomManager = RoomManager.getInstance(socket);
+
+  const [room, setRoom] = useState<RoomClient | null>(roomManager.currentRoom);
 
   useEffect(() => {
-    const listener = (updatedRoom: RoomClient) =>
-      listenForRoomUpdates(updatedRoom);
-    socket?.on(RoomEvent.RoomUpdated, listener);
+    // TODO: fix type
+    const handleRoomUpdate = (updatedRoom: any) => {
+      setRoom(updatedRoom);
+    };
+
+    roomManager.on(RoomEvent.RoomUpdated, handleRoomUpdate);
 
     return () => {
-      socket?.off(RoomEvent.RoomUpdated, listener);
-      return;
+      roomManager.off(RoomEvent.RoomUpdated, handleRoomUpdate);
     };
-  }, [socket, listenForRoomUpdates]);
-
-  /**
-   * emitWithResponse()
-   * This function involves emitting a socket event,
-   * waiting for a response, and then performing some action based on that response
-   */
-
-  const emitWithResponse = useCallback(
-    async (
-      event: RoomEvent,
-      payload: object,
-      callback: (room: RoomClient) => void
-    ) => {
-      if (!socket) throw new Error('Socket not initialized');
-
-      const response: SocketResponse<RoomClient> = await new Promise(resolve =>
-        socket.emit(event, payload, resolve)
-      );
-
-      if (!response.success) {
-        throw new Error(response.error);
-      }
-
-      const room = response.data;
-      callback(room);
-    },
-    [socket]
-  );
-
-  // The following functions are used to interact with the room
-
-  const createRoom = useCallback(
-    (displayName: string, avatar: string) =>
-      emitWithResponse(RoomEvent.CreateRoom, { displayName, avatar }, room => {
-        setLoading(true);
-        console.log('[Created room]', room);
-
-        setRoom(room);
-        router.push(`/room/${room.joinCode}`);
-        setLoading(false);
-      }),
-    [emitWithResponse, router]
-  );
-
-  const getRoom = useCallback(
-    (joinCode: string) =>
-      emitWithResponse(RoomEvent.GetRoomByJoinCode, { joinCode }, room => {
-        console.log('[Get room]', room);
-        setRoom(room);
-      }),
-    [emitWithResponse]
-  );
-
-  const joinRoom = useCallback(
-    (roomCode: string, displayName: string) =>
-      emitWithResponse(RoomEvent.JoinRoom, { roomCode, displayName }, room => {
-        console.log('[Join room]', room);
-        setRoom(room);
-      }),
-    [emitWithResponse]
-  );
-
-  const leaveRoom = useCallback(
-    () =>
-      emitWithResponse(RoomEvent.LeaveRoom, {}, room => {
-        console.log('[Leave room]', room);
-        setRoom(room);
-      }),
-    [emitWithResponse]
-  );
-
-  const setRoomGame = useCallback(
-    (game: GameType) =>
-      emitWithResponse(RoomEvent.SetGame, { game }, room => {
-        console.log('[Set room game]', room);
-        setRoom(room);
-      }),
-    [emitWithResponse]
-  );
-
-  const setGameOptions = useCallback(
-    (options: GameOptions) =>
-      emitWithResponse(RoomEvent.SetGameOptions, options, room => {
-        console.log('[Get room game options]', room);
-        setRoom(room);
-      }),
-    [emitWithResponse]
-  );
+  }, [roomManager]);
 
   return (
     <RoomContext.Provider
       value={{
         room,
-        loading,
-        getRoom,
-        createRoom,
-        joinRoom,
-        leaveRoom,
-        setRoomGame,
-        setGameOptions
+        createRoom: roomManager.createRoom.bind(roomManager),
+        joinRoom: roomManager.joinRoom.bind(roomManager),
+        leaveRoom: roomManager.leaveRoom.bind(roomManager),
+        setGame: roomManager.setGame.bind(roomManager),
+        setGameOptions: roomManager.setGameOptions.bind(roomManager)
       }}
     >
       {children}
@@ -146,4 +55,10 @@ export const RoomProvider: React.FC<RoomProviderProps> = ({ children }) => {
   );
 };
 
-export const useRoom = () => useContext(RoomContext);
+export const useRoom = () => {
+  const context = useContext(RoomContext);
+  if (!context) {
+    throw new Error('useRoom must be used within a RoomProvider');
+  }
+  return context;
+};

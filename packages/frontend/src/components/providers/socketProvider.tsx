@@ -1,59 +1,51 @@
 'use client';
-import Spinner from '../ui/spinner/spinner';
 
-import { FC, useContext, useEffect, useState } from 'react';
-import { SessionClient, SocketEvent } from '@joji/types';
-import { Socket, io } from 'socket.io-client';
-import { SocketContext } from '../contexts';
+import { SocketManager } from '@/libs/socketManager';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { Socket } from 'socket.io-client';
 
 interface SocketProviderProps {
   children: React.ReactNode;
 }
 
-export const SocketProvider: FC<SocketProviderProps> = ({ children }) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+interface SocketContextProps {
+  socket: Socket;
+}
+
+const SocketContext = createContext<SocketContextProps | null>(null);
+
+export const SocketProvider = (props: SocketProviderProps) => {
+  const { children } = props;
+
+  const socket = useRef<Socket>(SocketManager.getInstance().socket);
+  const [isConnected, setIsConnected] = useState(socket.current.connected);
 
   useEffect(() => {
-    initialiseSocket();
+    const currentSocket = socket.current;
+
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
+
+    currentSocket.on('connect', handleConnect);
+    currentSocket.on('disconnect', handleDisconnect);
+
+    return () => {
+      currentSocket.off('connect', handleConnect);
+      currentSocket.off('disconnect', handleDisconnect);
+    };
   }, []);
 
-  /**
-   * Initialise socket connection
-   *
-   */
-  const initialiseSocket = () => {
-    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-    const sessionId = localStorage.getItem('sessionId');
-
-    if (!serverUrl) {
-      console.error('Server URL not provided');
-      return;
-    }
-
-    const socketInstance = io(serverUrl, { autoConnect: false });
-    if (sessionId) {
-      socketInstance.auth = { sessionId };
-    }
-
-    socketInstance.connect();
-
-    socketInstance.on(SocketEvent.Session, (session: SessionClient) => {
-      console.log('session', session);
-      localStorage.setItem('sessionId', session.id);
-    });
-
-    setSocket(socketInstance);
-    setLoading(false);
-  };
-
-  if (loading && !socket) return <Spinner large />;
-
   return (
-    <SocketContext.Provider value={{ socket }}>
+    <SocketContext.Provider value={{ socket: socket.current }}>
       {children}
     </SocketContext.Provider>
   );
 };
 
-export const useSocket = () => useContext(SocketContext);
+export const useSocket = () => {
+  const context = useContext(SocketContext);
+  if (!context) {
+    throw new Error('useSocket must be used within a SocketProvider');
+  }
+  return context;
+};

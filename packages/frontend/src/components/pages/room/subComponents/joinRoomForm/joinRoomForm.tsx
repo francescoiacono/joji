@@ -4,10 +4,8 @@ import Form from '@/components/ui/forms/form/form';
 import FormTitle from '@/components/ui/forms/formTitle/formTitle';
 import Input from '@/components/ui/input/input';
 import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
-
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useRoom } from '@/components/providers';
 
 interface JoinRoomFormProps {
   joinRoom: (slug: string, displayName: string) => void;
@@ -15,7 +13,6 @@ interface JoinRoomFormProps {
 
 const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ joinRoom }) => {
   const [displayName, setDisplayName] = useState<string>('');
-  const { loading } = useRoom();
   const { slug } = useParams();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,16 +21,15 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({ joinRoom }) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (typeof slug === 'string') {
-      joinRoom(slug, displayName);
-    }
+    const roomSlug = Array.isArray(slug) ? slug[0] : slug;
+    joinRoom(roomSlug as string, displayName);
   };
 
   return (
     <StyledContainer
       style={{ width: '500px', height: '300px', padding: '1rem' }}
     >
-      <Form loading={loading} onSubmit={handleSubmit} buttonText='Join'>
+      <Form onSubmit={handleSubmit} buttonText='Join'>
         <FormTitle>joji.gg</FormTitle>
         <Input
           onChange={handleChange}

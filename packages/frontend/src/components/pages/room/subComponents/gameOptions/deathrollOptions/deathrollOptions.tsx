@@ -4,13 +4,16 @@ import Input from '@/components/ui/input/input';
 import { useState } from 'react';
 import { DeathrollOptions as Options, RoomEvent } from '@joji/types';
 import { useRoom } from '@/components/providers';
+import { useRouter, useParams } from 'next/navigation';
 
 interface DeathrollOptionsProps {
   gameOptions: Options;
 }
 
 const DeathrollOptions: React.FC<DeathrollOptionsProps> = ({ gameOptions }) => {
-  const { setGameOptions } = useRoom();
+  const { setGameOptions, startGame } = useRoom();
+  const router = useRouter();
+  const { slug } = useParams();
   const [options, setOptions] = useState<Options>(gameOptions);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,6 +27,8 @@ const DeathrollOptions: React.FC<DeathrollOptionsProps> = ({ gameOptions }) => {
 
   const handleClick = () => {
     setGameOptions(options);
+    startGame();
+    router.push(`/room/${slug}/deathroll`);
   };
 
   return (
