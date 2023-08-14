@@ -23,13 +23,13 @@ export const createRoomHandler: Handler<Req, Res, Controller> = options => {
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
-    return ack({ success: false, error: SocketMessage.ValidationError });
+    return ack?.({ success: false, error: SocketMessage.ValidationError });
   }
 
   // Make sure the display name is valid
   const displayNameError = validateDisplayName(displayName);
   if (displayNameError) {
-    return ack({ success: false, error: displayNameError });
+    return ack?.({ success: false, error: displayNameError });
   }
 
   // Remove the user from their current room, if they are in one
@@ -49,7 +49,7 @@ export const createRoomHandler: Handler<Req, Res, Controller> = options => {
   room.setHost(session.user.id);
 
   // Acknowledge the event with the room
-  return ack({
+  return ack?.({
     success: true,
     data: room.getClient(session.user.id)
   });

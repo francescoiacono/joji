@@ -14,7 +14,7 @@ export const leaveRoomHandler: Handler<Req, Res, Controller> = options => {
   roomService.getUserRoom(session.user.id)?.removeUser(session.user.id);
 
   // Acknowledge the event with the room
-  return ack({
+  return ack?.({
     success: true,
     data: null
   });

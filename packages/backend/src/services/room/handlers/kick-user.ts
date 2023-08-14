@@ -20,7 +20,7 @@ export const kickUserHandler: Handler<Req, Res, Controller> = options => {
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
-    return ack({ success: false, error: SocketMessage.ValidationError });
+    return ack?.({ success: false, error: SocketMessage.ValidationError });
   }
 
   // Get the room the user is in
@@ -28,12 +28,12 @@ export const kickUserHandler: Handler<Req, Res, Controller> = options => {
 
   // If the user is not in a room, return an error
   if (!room) {
-    return ack({ success: false, error: RoomMessage.NotInRoom });
+    return ack?.({ success: false, error: RoomMessage.NotInRoom });
   }
 
   // Make sure the user is the host
   if (!room.isHost(session.user.id)) {
-    return ack({ success: false, error: RoomMessage.NotHost });
+    return ack?.({ success: false, error: RoomMessage.NotHost });
   }
 
   // Find the user to kick
@@ -41,19 +41,19 @@ export const kickUserHandler: Handler<Req, Res, Controller> = options => {
 
   // If the user is not in the room, return an error
   if (!user) {
-    return ack({ success: false, error: RoomMessage.UserNotFound });
+    return ack?.({ success: false, error: RoomMessage.UserNotFound });
   }
 
   // Make sure the user isn't trying to kick themselves
   if (user.userId === session.user.id) {
-    return ack({ success: false, error: RoomMessage.CannotKickSelf });
+    return ack?.({ success: false, error: RoomMessage.CannotKickSelf });
   }
 
   // Remove the user from the room
   room.removeUser(user.userId);
 
   // Acknowledge the event with the room
-  return ack({
+  return ack?.({
     success: true,
     data: room.getClient(session.user.id)
   });

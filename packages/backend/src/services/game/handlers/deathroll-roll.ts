@@ -21,28 +21,28 @@ export const deathrollRollHandler: Handler<Req, Res, Controller> = options => {
 
   // If the player is not in a room, return
   if (!room) {
-    return ack({ success: false, error: RoomMessage.NotInRoom });
+    return ack?.({ success: false, error: RoomMessage.NotInRoom });
   }
 
   // Make sure the game type is deathroll
   if (room.game?.type !== GameType.Deathroll) {
-    return ack({ success: false, error: GameMessage.WrongGameType });
+    return ack?.({ success: false, error: GameMessage.WrongGameType });
   }
 
   // Make sure the game is in progress
   if (room.game?.getStatus() !== GameStatus.InProgress) {
-    return ack({ success: false, error: GameMessage.GameNotInProgress });
+    return ack?.({ success: false, error: GameMessage.GameNotInProgress });
   }
 
   // Make sure it's the player's turn
   const gameState = room.game.getState();
   if (gameState.currentPlayerId !== session.user.id) {
-    return ack({ success: false, error: GameMessage.NotYourTurn });
+    return ack?.({ success: false, error: GameMessage.NotYourTurn });
   }
 
   // Take the turn
   room.game.takeTurn();
 
   // Acknowledge the request
-  ack({ success: true, data: room.game.getState() });
+  ack?.({ success: true, data: room.game.getState() });
 };

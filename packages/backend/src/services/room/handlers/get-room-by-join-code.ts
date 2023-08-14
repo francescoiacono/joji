@@ -23,14 +23,14 @@ export const getRoomByJoinCodeHandler: Handler<
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
-    return ack({ success: false, error: SocketMessage.ValidationError });
+    return ack?.({ success: false, error: SocketMessage.ValidationError });
   }
 
   // Get the room by the join code
   const room = roomService.getRoom(data.joinCode);
 
   // Acknowledge the event with the room
-  return ack({
+  return ack?.({
     success: true,
     data: room?.getClient(session.user.id) ?? null
   });

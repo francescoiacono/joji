@@ -30,23 +30,23 @@ export const setGameHandler: Handler<Req, Res, Controller> = options => {
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
-    return ack({ success: false, error: SocketMessage.ValidationError });
+    return ack?.({ success: false, error: SocketMessage.ValidationError });
   }
 
   // Make sure the room exists
   const room = roomService.getUserRoom(session.user.id);
   if (!room) {
-    return ack({ success: false, error: RoomMessage.NotInRoom });
+    return ack?.({ success: false, error: RoomMessage.NotInRoom });
   }
 
   // Make sure the user is the host
   if (!room.isHost(session.user.id)) {
-    return ack({ success: false, error: RoomMessage.NotHost });
+    return ack?.({ success: false, error: RoomMessage.NotHost });
   }
 
   // Make sure the game isn't in progress
   if (room.game && room.game.getStatus() !== GameStatus.Waiting) {
-    return ack({ success: false, error: RoomMessage.GameInProgress });
+    return ack?.({ success: false, error: RoomMessage.GameInProgress });
   }
 
   // Create the game
@@ -58,9 +58,9 @@ export const setGameHandler: Handler<Req, Res, Controller> = options => {
       room.setGame(new Deathroll());
       break;
     default:
-      return ack({ success: false, error: RoomMessage.GameNotFound });
+      return ack?.({ success: false, error: RoomMessage.GameNotFound });
   }
 
   // Acknowledge the request
-  return ack({ success: true, data: room.getClient(session.user.id) });
+  return ack?.({ success: true, data: room.getClient(session.user.id) });
 };

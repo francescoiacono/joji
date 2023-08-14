@@ -4,7 +4,7 @@ import { Socket } from 'socket.io';
 
 export type Handler<TRequest, TResponse, TController> = (options: {
   data: TRequest;
-  ack: (res: SocketResponse<TResponse>) => void;
+  ack?: (res: SocketResponse<TResponse>) => void;
   controller: TController;
   socket: Socket;
   session: Session;
