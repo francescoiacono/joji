@@ -1,5 +1,12 @@
 'use client';
-import { GameOptions, GameType, RoomClient, RoomEvent } from '@joji/types';
+import {
+  GameEvent,
+  GameOptions,
+  GameState,
+  GameType,
+  RoomClient,
+  RoomEvent
+} from '@joji/types';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useSocket } from './socketProvider';
 import { RoomManager } from '@/libs/roomManager';
@@ -10,6 +17,7 @@ interface RoomProviderProps {
 
 interface RoomContextProps {
   room: RoomClient | null;
+  game: GameState | null;
   createRoom: (displayName: string, avatar: string) => void;
   joinRoom: (roomCode: string, displayName: string) => void;
   leaveRoom: () => void;
@@ -26,17 +34,25 @@ export const RoomProvider = (props: RoomProviderProps) => {
   const roomManager = RoomManager.getInstance(socket);
 
   const [room, setRoom] = useState<RoomClient | null>(roomManager.currentRoom);
+  const [gameState, setGameState] = useState<GameState | null>(
+    roomManager.currentGameState
+  );
 
   useEffect(() => {
-    // TODO: fix type
-    const handleRoomUpdate = (updatedRoom: any) => {
+    const handleRoomUpdate = (updatedRoom: RoomClient) => {
       setRoom(updatedRoom);
     };
 
+    const handleGameStateUpdate = (updatedGameState: GameState) => {
+      setGameState(updatedGameState);
+    };
+
     roomManager.on(RoomEvent.RoomUpdated, handleRoomUpdate);
+    roomManager.on(GameEvent.GameStateUpdated, handleGameStateUpdate);
 
     return () => {
       roomManager.off(RoomEvent.RoomUpdated, handleRoomUpdate);
+      roomManager.off(GameEvent.GameStateUpdated, handleGameStateUpdate);
     };
   }, [roomManager]);
 
@@ -44,6 +60,7 @@ export const RoomProvider = (props: RoomProviderProps) => {
     <RoomContext.Provider
       value={{
         room,
+        game: gameState,
         createRoom: roomManager.createRoom.bind(roomManager),
         joinRoom: roomManager.joinRoom.bind(roomManager),
         leaveRoom: roomManager.leaveRoom.bind(roomManager),

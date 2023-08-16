@@ -1,5 +1,3 @@
-// TODO: Fix types
-
 class EventEmitter {
   private listeners: { [key: string]: Function[] } = {};
 

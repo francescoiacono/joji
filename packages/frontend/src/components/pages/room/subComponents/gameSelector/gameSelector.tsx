@@ -1,11 +1,11 @@
 import { useRoom } from '@/components/providers';
-import DeathrollOptions from '../gameOptions/deathrollOptions/deathrollOptions';
 import { GameType } from '@joji/types';
+import { DeathrollOptions } from './gameOptions/deathrollOptions/deathrollOptions';
 
-import * as styles from './selectGame.linaria';
+import * as styles from './gameSelector.linaria';
 import GameBox from '../gameBox/gameBox';
 
-const SelectGame: React.FC = () => {
+export const GameSelector: React.FC = () => {
   const { setGame, room } = useRoom();
 
   const handleClick = (game: GameType) => {
@@ -29,5 +29,3 @@ const SelectGame: React.FC = () => {
     </div>
   );
 };
-
-export default SelectGame;

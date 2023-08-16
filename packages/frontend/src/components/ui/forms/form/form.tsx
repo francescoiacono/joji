@@ -1,4 +1,4 @@
-import PrimaryButton from '../../buttons/primaryButton/primaryButton';
+import { PrimaryButton } from '@/components/ui/buttons';
 
 import * as styles from './form.linaria';
 

@@ -1,6 +1,6 @@
 import * as styles from './secondaryButton.linaria';
 
-const SecondaryButton = ({
+export const SecondaryButton = ({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
@@ -12,5 +12,3 @@ const SecondaryButton = ({
     </button>
   );
 };
-
-export default SecondaryButton;

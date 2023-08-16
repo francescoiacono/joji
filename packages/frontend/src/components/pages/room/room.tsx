@@ -1,17 +1,15 @@
 'use client';
 
 import JoinRoomForm from './subComponents/joinRoomForm/joinRoomForm';
-import SelectGame from './subComponents/selectGame/selectGame';
 import UsersList from './subComponents/usersList/usersList';
 import StyledContainer from '@/components/ui/containers/styledContainer/styledContainer';
-import SecondaryButton from '@/components/ui/buttons/secondaryButton/secondaryButton';
+import { LeaveButton } from '@/components/ui/buttons';
 import { useRoom } from '@/components/providers';
-import { useParams } from 'next/navigation';
+import { GameSelector } from './subComponents/gameSelector';
 import * as styles from './room.linaria';
 
 const Room = () => {
-  let { slug } = useParams();
-  const { room, joinRoom, leaveRoom } = useRoom();
+  const { room, joinRoom } = useRoom();
 
   return (
     <>
@@ -21,10 +19,10 @@ const Room = () => {
             <div className={styles.container}>
               <UsersList users={room.users} />
               <div className={styles.divider}></div>
-              <SelectGame />
+              <GameSelector />
             </div>
           </StyledContainer>
-          <SecondaryButton onClick={() => leaveRoom()}>Leave</SecondaryButton>
+          <LeaveButton />
         </section>
       ) : (
         <JoinRoomForm joinRoom={joinRoom} />

@@ -1,20 +1,28 @@
-import PrimaryButton from '@/components/ui/buttons/primaryButton/primaryButton';
 import Input from '@/components/ui/input/input';
 
-import { useState } from 'react';
+import { PrimaryButton } from '@/components/ui/buttons';
+import { useEffect, useState } from 'react';
 import { DeathrollOptions as Options, RoomEvent } from '@joji/types';
 import { useRoom } from '@/components/providers';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface DeathrollOptionsProps {
   gameOptions: Options;
 }
 
-const DeathrollOptions: React.FC<DeathrollOptionsProps> = ({ gameOptions }) => {
-  const { setGameOptions, startGame } = useRoom();
+export const DeathrollOptions: React.FC<DeathrollOptionsProps> = ({
+  gameOptions
+}) => {
   const router = useRouter();
-  const { slug } = useParams();
+  const path = usePathname();
+  const { setGameOptions, startGame, game } = useRoom();
   const [options, setOptions] = useState<Options>(gameOptions);
+
+  useEffect(() => {
+    if (game) {
+      router.push(`${path}/deathroll`);
+    }
+  }, [game, path, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // remove leading 0
@@ -28,7 +36,6 @@ const DeathrollOptions: React.FC<DeathrollOptionsProps> = ({ gameOptions }) => {
   const handleClick = () => {
     setGameOptions(options);
     startGame();
-    router.push(`/room/${slug}/deathroll`);
   };
 
   return (
@@ -46,5 +53,3 @@ const DeathrollOptions: React.FC<DeathrollOptionsProps> = ({ gameOptions }) => {
     </>
   );
 };
-
-export default DeathrollOptions;

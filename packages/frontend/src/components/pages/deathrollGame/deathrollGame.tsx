@@ -3,14 +3,12 @@
 import { useRoom, useSocket } from '@/components/providers';
 import { useState } from 'react';
 import { DeathrollState, GameEvent, SocketSuccessResponse } from '@joji/types';
-
+import { LeaveButton, SecondaryButton } from '@/components/ui/buttons';
 const DeathrollGame = () => {
-  const { room } = useRoom();
+  const { game } = useRoom();
   const { socket } = useSocket();
 
-  const [number, setNumber] = useState<number | undefined>(
-    room?.game?.options.startingValue
-  );
+  const [number, setNumber] = useState<number | undefined>(game?.currentCount);
 
   const roll = () => {
     socket?.emit(
@@ -28,6 +26,7 @@ const DeathrollGame = () => {
       <h1>Deathroll Game</h1>
       <h2>{number}</h2>
       <button onClick={roll}>Roll</button>
+      <LeaveButton />
     </div>
   );
 };

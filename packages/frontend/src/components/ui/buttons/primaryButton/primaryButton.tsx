@@ -6,7 +6,7 @@ interface PrimaryButtonProps
   loading?: boolean;
 }
 
-const PrimaryButton: React.FC<PrimaryButtonProps> = ({ ...props }) => {
+export const PrimaryButton: React.FC<PrimaryButtonProps> = ({ ...props }) => {
   return (
     <button className={`${styles.primaryButton} ${props.className}`} {...props}>
       {props.children}
@@ -14,5 +14,3 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({ ...props }) => {
     </button>
   );
 };
-
-export default PrimaryButton;

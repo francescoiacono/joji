@@ -1,16 +1,26 @@
-import { GameOptions, GameType, RoomClient, RoomEvent } from '@joji/types';
+import {
+  GameEvent,
+  GameOptions,
+  GameState,
+  GameType,
+  RoomClient,
+  RoomEvent,
+  SocketResponse
+} from '@joji/types';
 import { Socket } from 'socket.io-client';
 import { EventEmitter } from '../eventEmitter';
 
 class RoomManager {
   private static instance: RoomManager;
-  private room: RoomClient | null = null;
   private socket: Socket;
+  private room: RoomClient | null = null;
+  private gameState: GameState | null = null;
   private eventEmitter = new EventEmitter();
 
   private constructor(socket: Socket) {
     this.socket = socket;
     this.listenForRoomUpdates();
+    this.listenForGameUpdates();
   }
 
   /**
@@ -33,6 +43,13 @@ class RoomManager {
   }
 
   /**
+   * Returns the current game state.
+   */
+  get currentGameState() {
+    return this.gameState;
+  }
+
+  /**
    * This function emits a get room by join code event to the server.
    */
   getRoomByJoinCode(joinCode: string) {
@@ -49,7 +66,6 @@ class RoomManager {
    * This function is used to subscribe to room updates.
    */
   on(eventName: string, callback: Function) {
-    console.log('subscribing to room updates');
     this.eventEmitter.addListener(eventName, callback);
   }
 
@@ -77,9 +93,6 @@ class RoomManager {
    * This function emits a jooin room event to the server.
    */
   joinRoom(roomCode: string, displayName: string) {
-    console.log('displayName', displayName);
-    console.log('roomCode', roomCode);
-
     this.socket.emit(
       RoomEvent.JoinRoom,
       {
@@ -88,7 +101,6 @@ class RoomManager {
         avatar: '1.png'
       },
       (room: RoomClient) => {
-        console.log('room', room);
         this.room = room;
       }
     );
@@ -120,17 +132,29 @@ class RoomManager {
   setGameOptions(options: GameOptions) {
     this.socket.emit(
       RoomEvent.SetGameOptions,
-      { options },
-      (room: RoomClient) => {
-        this.room = room;
+      options,
+      (res: SocketResponse<RoomClient>) => {
+        if (res.success) {
+          this.room = res.data;
+        }
       }
     );
   }
 
+  /**
+   * This function emits a set game event to the server.
+   */
+
   startGame() {
-    this.socket.emit(RoomEvent.StartGame, null, (room: RoomClient) => {
-      this.room = room;
-    });
+    this.socket.emit(
+      RoomEvent.StartGame,
+      null,
+      (res: SocketResponse<GameState>) => {
+        if (res.success) {
+          this.gameState = res.data;
+        }
+      }
+    );
   }
 
   /**
@@ -140,6 +164,13 @@ class RoomManager {
     this.socket.on(RoomEvent.RoomUpdated, (room: RoomClient) => {
       this.room = room;
       this.eventEmitter.emit(RoomEvent.RoomUpdated, room);
+    });
+  }
+
+  private listenForGameUpdates() {
+    this.socket.on(GameEvent.GameStateUpdated, (game: GameState) => {
+      this.gameState = game;
+      this.eventEmitter.emit(GameEvent.GameStateUpdated, game);
     });
   }
 }
