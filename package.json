@@ -5,7 +5,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n \"CLIENT,SERVER\" -c \"bgBlack.bold,bgMagenta.bold\" \"npm run dev --workspace=packages/frontend\" \"npm run dev --workspace=packages/backend\"",
+    "_concurrently": "concurrently -n \"CLIENT,SERVER\" -c \"bgBlack.bold,bgMagenta.bold\"",
+    "client": "npm run dev --workspace=packages/frontend",
+    "server": "npm run dev:no-sandbox --workspace=packages/backend",
+    "dev": "npm run _concurrently -- \"npm run client\" \"npm run server\"",
     "prepare": "husky install",
     "build:types": "tsc -p packages/types"
   },
