@@ -73,6 +73,7 @@ export class Deathroll extends Game<DeathrollOptions, DeathrollState> {
 
     // Go to the next player's turn
     const nextPlayer = (this.currentPlayerIndex + 1) % this.players.length;
+    this.currentPlayerIndex = nextPlayer;
 
     // Update the state
     this.updateState({

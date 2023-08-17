@@ -9,4 +9,4 @@ var GameEvent;
     GameEvent["GameEnded"] = "GAME_ENDED";
     // Client -> Server
     GameEvent["DeathrollRoll"] = "DEATHROLL_ROLL";
-})(GameEvent = exports.GameEvent || (exports.GameEvent = {}));
+})(GameEvent || (exports.GameEvent = GameEvent = {}));

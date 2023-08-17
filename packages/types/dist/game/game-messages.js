@@ -6,4 +6,4 @@ var GameMessage;
     GameMessage["WrongGameType"] = "WRONG_GAME_TYPE";
     GameMessage["GameNotInProgress"] = "GAME_NOT_IN_PROGRESS";
     GameMessage["NotYourTurn"] = "NOT_YOUR_TURN";
-})(GameMessage = exports.GameMessage || (exports.GameMessage = {}));
+})(GameMessage || (exports.GameMessage = GameMessage = {}));

@@ -18,4 +18,4 @@ var RoomMessage;
     RoomMessage["RoomFull"] = "ROOM_FULL";
     RoomMessage["InvalidGameOptions"] = "INVALID_GAME_OPTIONS";
     RoomMessage["NotAllUsersReady"] = "NOT_ALL_USERS_READY";
-})(RoomMessage = exports.RoomMessage || (exports.RoomMessage = {}));
+})(RoomMessage || (exports.RoomMessage = RoomMessage = {}));
