@@ -1,0 +1,49 @@
+.log {
+  all: unset;
+  padding: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #d3d8dc;
+
+  &:hover {
+    background-color: rgba(107, 114, 128, 0.1);
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-areas: 'event log timestamp';
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.timestamp {
+  grid-area: timestamp;
+  opacity: 0.5;
+}
+
+.event {
+  grid-area: event;
+  font-size: 1.2rem;
+}
+
+.direction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    fill: currentColor;
+  }
+
+  &.in {
+    transform: rotate(180deg);
+  }
+}
+
+.code {
+  grid-area: log;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

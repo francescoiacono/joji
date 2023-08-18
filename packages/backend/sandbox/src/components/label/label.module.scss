@@ -1,0 +1,53 @@
+.label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+
+  &[data-color='1'] {
+    background-color: #fbf2db;
+    color: #7e5f00;
+    border-color: #d6c69f;
+  }
+
+  &[data-color='2'] {
+    background-color: #fde7e9;
+    color: #7e2d40;
+    border-color: #d6a9b2;
+  }
+
+  &[data-color='3'] {
+    background-color: #e2f0cb;
+    color: #3f6212;
+    border-color: #b7d08c;
+  }
+
+  &[data-color='4'] {
+    background-color: #e6f0fd;
+    color: #1e3a8a;
+    border-color: #9cc3ff;
+  }
+
+  &[data-color='5'] {
+    background-color: #ffeef8;
+    color: #a40259;
+    border-color: #e6aec8;
+  }
+
+  &[data-color='6'] {
+    background-color: #f4effa;
+    color: #482975;
+    border-color: #c0b2d2;
+  }
+
+  &[data-color='7'] {
+    background-color: #ffeef8;
+    color: #a40259;
+    border-color: #e6aec8;
+  }
+}

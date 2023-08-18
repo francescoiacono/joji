@@ -1,3 +1,5 @@
+import './global.css';
+
 interface LayoutProps {
   children: React.ReactNode;
 }

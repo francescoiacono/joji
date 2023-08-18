@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently -n \"SERVER,SANDBOX\" -c \"bgMagenta.bold,bgBlack.bold\" \"npm run server\" \"npm run sandbox\"",
+    "dev": "CLIENT_URL=http://localhost:8001 concurrently -n \"SERVER,SANDBOX\" -c \"bgMagenta.bold,bgBlack.bold\" \"npm run server\" \"npm run sandbox\"",
     "dev:no-sandbox": "npm run server",
     "server": "NODE_ENV=development nodemon --watch 'src/**/*.ts' --exec 'ts-node' -r tsconfig-paths/register src/app.ts",
     "sandbox": "cd sandbox && npm run dev"
