@@ -2,12 +2,12 @@
 
 import { useSocket } from '@/components/providers/socket';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './connection.module.scss';
 
 export const Connection = () => {
   const { socket } = useSocket();
-  const [shouldBeConnected, setShouldBeConnected] = useState(false);
+  const [shouldBeConnected, setShouldBeConnected] = useState(true);
 
   const toggleConnection = () => {
     if (socket.connected) {
@@ -18,6 +18,14 @@ export const Connection = () => {
       socket.connect();
     }
   };
+
+  // Connect on mount
+  useEffect(
+    () => {
+      toggleConnection();
+    },
+    [] /* eslint-disable-line react-hooks/exhaustive-deps */
+  );
 
   return (
     <Button

@@ -4,6 +4,13 @@ import { Socket } from '@/services';
 import { Socket as SocketIO } from 'socket.io-client';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 
+export interface SocketLog {
+  timestamp: number;
+  event: string;
+  args: any[];
+  direction?: 'in' | 'out';
+}
+
 interface SocketProviderProps {
   children?: React.ReactNode;
 }

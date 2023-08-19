@@ -18,13 +18,15 @@ const schema: yup.ObjectSchema<Partial<Req>> = yup.object({
 
 export const createRoomHandler: Handler<Req, Res, Controller> = options => {
   const { data, ack, controller, session } = options;
-  const { displayName, avatar } = data;
   const { roomService } = controller;
 
   // Validate the data
   if (!schemaIsValid(schema, data)) {
     return ack?.({ success: false, error: SocketMessage.ValidationError });
   }
+
+  // Destructure the data
+  const { displayName, avatar } = data;
 
   // Make sure the display name is valid
   const displayNameError = validateDisplayName(displayName);

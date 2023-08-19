@@ -17,7 +17,7 @@ export const Logs = () => {
   const [logs, setLogs] = useState<Log[]>([]);
   const uniqueEvents = useRef<Set<string>>(new Set());
 
-  const handleIncomingLogs = useCallback((event: string, ...args: any[]) => {
+  const handleIncomingLogs = useCallback((event: string, args: any = {}) => {
     setLogs(prevLogs => [
       { timestamp: Date.now(), event, args, direction: 'in' },
       ...prevLogs
@@ -25,7 +25,7 @@ export const Logs = () => {
     uniqueEvents.current.add(event);
   }, []);
 
-  const handleOutgoingLogs = useCallback((event: string, ...args: any[]) => {
+  const handleOutgoingLogs = useCallback((event: string, args: any = {}) => {
     setLogs(prevLogs => [
       { timestamp: Date.now(), event, args, direction: 'out' },
       ...prevLogs
