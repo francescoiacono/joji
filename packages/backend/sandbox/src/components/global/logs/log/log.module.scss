@@ -1,11 +1,13 @@
 .log {
   all: unset;
+  box-sizing: border-box;
+  width: 100%;
   padding: 1rem;
   cursor: pointer;
-  border-bottom: 1px solid #d3d8dc;
+  border-bottom: 1px solid rgb(228, 228, 231);
 
   &:hover {
-    background-color: rgba(107, 114, 128, 0.1);
+    background-color: rgba(107, 114, 128, 0.05);
   }
 }
 

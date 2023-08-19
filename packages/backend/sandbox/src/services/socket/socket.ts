@@ -1,3 +1,5 @@
+'use client';
+
 import { io, Socket as SocketIO } from 'socket.io-client';
 
 export class Socket {
@@ -5,10 +7,13 @@ export class Socket {
   private _socket: SocketIO;
 
   private constructor() {
-    this._socket = io('http://localhost:8000');
+    this._socket = io('http://localhost:8000', { autoConnect: false });
   }
 
   private static get instance(): Socket {
+    if (typeof window === 'undefined') {
+      throw new Error('Socket can only be used in the browser');
+    }
     if (!Socket._instance) {
       Socket._instance = new Socket();
     }

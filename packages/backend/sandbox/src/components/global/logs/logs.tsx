@@ -1,9 +1,9 @@
 'use client';
 
-import { Socket } from '@/services';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Log } from './log';
 import styles from './logs.module.scss';
+import { useSocket } from '@/components/providers/socket';
 
 export interface Log {
   timestamp: number;
@@ -13,7 +13,7 @@ export interface Log {
 }
 
 export const Logs = () => {
-  const { socket } = Socket;
+  const { socket } = useSocket();
   const [logs, setLogs] = useState<Log[]>([]);
   const uniqueEvents = useRef<Set<string>>(new Set());
 

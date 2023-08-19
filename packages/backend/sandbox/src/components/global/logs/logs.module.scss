@@ -1,0 +1,9 @@
+.logs {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}

@@ -1,8 +1,8 @@
 'use client';
 
-import { Label } from '@/components/label';
+import { Label } from '@/components/ui/label';
 import { Log as LogType } from '..';
-import { CodeBlock, InlineCode } from '@/components/code';
+import { CodeBlock, InlineCode } from '@/components/ui/code';
 import { useState } from 'react';
 import styles from './log.module.scss';
 import classNames from 'classnames';

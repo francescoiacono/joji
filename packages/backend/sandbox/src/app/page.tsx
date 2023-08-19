@@ -1,11 +1,17 @@
-import { Logs } from '@/components/logs';
+'use client';
+
+import { Logs } from '@/components/global/logs';
+import { ConfigPanel } from '@/components/global/config-panel';
 import styles from './page.module.scss';
 
 const Page = () => {
   return (
     <div className={styles.page}>
       <main className={styles.main}>lol</main>
-      <Logs />
+      <aside className={styles.aside}>
+        <ConfigPanel />
+        <Logs />
+      </aside>
     </div>
   );
 };
